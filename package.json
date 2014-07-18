@@ -1,0 +1,40 @@
+{
+  "name": "analyze.js",
+  "version": "0.0.0",
+  "description": "0.0.1",
+  "main": "main.js",
+  "dependencies": {
+    "connect": "~2.23.0",
+    "connect-livereload": "~0.4.0",
+    "falafel": "~0.3.1",
+    "gulp": "~3.8.6",
+    "gulp-autoprefixer": "~0.0.7",
+    "gulp-bower-files": "~0.2.7",
+    "gulp-cache": "~0.1.11",
+    "gulp-coffee": "~2.1.1",
+    "gulp-clean": "~0.2.4",
+    "gulp-csso": "~0.2.9",
+    "gulp-flatten": "~0.0.2",
+    "gulp-filter": "~0.4.1",
+    "gulp-imagemin": "~0.5.1",
+    "gulp-livereload": "~1.5.0",
+    "gulp-jshint": "~1.7.1",
+    "gulp-load-plugins": "~0.5.3",
+    "gulp-ruby-sass": "~0.4.3",
+    "gulp-uglify": "~0.2.1",
+    "gulp-size": "~0.3.1",
+    "gulp-useref": "~0.4.5",
+    "jshint-stylish": "~0.2.0",
+    "opn": "~0.1.2",
+    "wiredep": "~1.8.2",
+    "gulp-util": "^2.2.20",
+    "envify": "^1.2.1",
+    "react": "^0.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philipp Otto",
+  "license": "ISC"
+}
