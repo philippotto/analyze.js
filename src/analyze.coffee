@@ -114,34 +114,118 @@ printCallGraph = (node, indention = 0) ->
 console.log("printing callGraph")
 printCallGraph(callGraph.root)
 
+converter = new Showdown.converter()
 
+if not localStorage.getItem("comments")
+
+  localStorage.setItem("comments", JSON.stringify([
+    {author: "Pete Hunt", text: "This is one comment"}
+    {author: "Jordan Walke", text: "This is *another* comment"}
+  ]))
+
+
+addComment = (author, text) ->
+
+  comments = localStorage.getItem("comments")
+  comments = JSON.parse(comments)
+  comments.push({author, text})
+
+  comments = JSON.stringify(comments)
+  localStorage.setItem("comments", comments)
+
+removeComment = ->
+
+  comments = localStorage.getItem("comments")
+  comments = JSON.parse(comments)
+  comments.splice(-1)
+
+  comments = JSON.stringify(comments)
+  localStorage.setItem("comments", comments)
 
 R = React.DOM
 
-CommentForm = React.createClass(
-  render : ->
-    R.div {className : "commentForm"},
-      "Hello, world! I am a CommentBox."
-)
 
-
-CommentList = React.createClass(
-  render : ->
-    R.div {className : "commentList"},
-      "CommentList."
-)
+# CommentBox
+#   CommentList
+#     Comment
+#   CommentForm
 
 CommentBox = React.createClass(
+
+  getInitialState : ->
+    data : []
+
+  handleCommentRemove : (author, text) ->
+
+    removeComment()
+    @setState data : JSON.parse localStorage.getItem("comments")
+
+  handleCommentSubmit : ({author, text}) ->
+    addComment(author, text)
+    @setState data : JSON.parse localStorage.getItem("comments")
+
+
+  componentDidMount : ->
+    @setState data : JSON.parse localStorage.getItem("comments")
+    # setInterval(=>
+    #   @setState data : JSON.parse localStorage.getItem("comments")
+    # , @props.pollInterval)
+
   render : ->
     R.div {className : "commentBox"},
       R.h1 null, "Comments"
-      CommentList()
-      CommentForm()
+      CommentList {data : @state.data, onCommentRemove : @handleCommentRemove}
+      CommentForm {onCommentSubmit : @handleCommentSubmit}
+)
 
+CommentList = React.createClass(
+  render : ->
+    commentNodes = @props.data.map (comment) =>
+      Comment {author : comment.author, onCommentRemove : @props.onCommentRemove}, comment.text
+
+    R.div {className : "commentList"},
+      commentNodes
+)
+
+Comment = React.createClass(
+  remove : ->
+    console.log("remove", arguments)
+    @props.onCommentRemove(@props.author, @props.children.toString())
+
+  render : ->
+    rawMarkup = converter.makeHtml(this.props.children.toString())
+
+    R.div {className : "comment"},
+      R.h2 {className : "commentAuthor", onClick : @remove}, @props.author
+      R.span {dangerouslySetInnerHTML : { __html : rawMarkup}}
+      R.a {href : "#", onClick : @remove}, "Remove"
 )
 
 
+CommentForm = React.createClass(
+  handleSubmit : (evt) ->
+    author = @refs.author.getDOMNode().value
+    text = @refs.text.getDOMNode().value
+
+    @props.onCommentSubmit({author, text})
+
+    @refs.author.getDOMNode().value = ''
+    @refs.text.getDOMNode().value = ''
+
+    return false
+
+  render : ->
+    R.form {className : "commentForm", onSubmit : @handleSubmit},
+      R.input {ref : "author", type : "text", placeholder : "Your name"}
+      R.input {ref : "text", type : "text", placeholder : "Say something..."}
+      R.input {type : "submit", value : "Post"}
+)
+
+
+DOMroot = document.getElementById('content')
+
 React.renderComponent(
-  CommentBox({}),
-  document.getElementById('content')
-);
+  CommentBox {url : "comment.json", pollInterval : 100}
+  DOMroot
+)
+
