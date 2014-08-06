@@ -11,6 +11,7 @@ require.config(
     falafel : "../bower_components/falafel/index"
     esprima : "../bower_components/esprima/esprima"
     react : "../bower_components/react/react"
+    foundation : "../bower_components/foundation/js/foundation"
 
   map :
     backbone :
@@ -31,10 +32,5 @@ require.config(
     "falafel" :
       deps: ["esprima"]
       exports: "module.exports"
-      init: ->
-        debugger
-
-
-
 
 )

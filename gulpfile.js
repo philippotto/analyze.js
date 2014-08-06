@@ -7,6 +7,7 @@ try {
   gulp = require("gulp");
 
   $ = require("gulp-load-plugins")();
+
   $.amdOptimize = require("amd-optimize");
   $.rimraf = require("rimraf");
   $.through = require("through2");
@@ -29,8 +30,8 @@ var options = require("./gulp_options.json");
 
 
 $.handleError = function (err) {
-  util.log(util.colors.red("!!"), err.toString())
-  util.beep()
+  util.log(util.colors.red("!!"), err.toString());
+  util.beep();
 }
 
 $.logger = function () {

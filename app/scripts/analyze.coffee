@@ -1,9 +1,11 @@
 ### define
 falafel : falafel
 react : React
+foundation : Foundation
 ###
 
 ->
+  $(document).foundation()
 
   window.FunctionStore =
 
@@ -229,10 +231,9 @@ react : React
   )
 
 
-  DOMroot = document.getElementById('content')
+  DOMroot = document.getElementById('main')
 
   React.renderComponent(
     CommentBox {url : "comment.json", pollInterval : 100}
     DOMroot
   )
-

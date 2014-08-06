@@ -19,6 +19,7 @@
     "bootstrap": "~3.2.0",
     "syphon": "scalableminds/syphon#~0.4.1",
     "falafel": "substack/node-falafel",
+    "foundation": "5.3.3"
     "font-awesome": "~4.1.0",
     "marionette": "~2.0.3"
   },
