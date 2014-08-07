@@ -18,22 +18,64 @@
   </head>
   <body>
 
-    <div id="main">
-      <!-- Dynamic html injection -->
+    <nav class="top-bar" data-topbar>
+      <ul class="title-area">
+        <li class="name">
+          <h1><a href="#">analyze.js</a></h1>
+        </li>
+         <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+      </ul>
+
+      <section class="top-bar-section">
+        <!-- Left Nav Section -->
+        <ul class="left">
+          <li class="has-form">
+            <div class="row collapse">
+              <div class="large-8 small-9 columns">
+                <input type="text" placeholder="Find Stuff">
+              </div>
+              <div class="large-4 small-3 columns">
+                <a href="#" class="alert button expand">Search</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Right Nav Section -->
+        <ul class="right">
+          <li class="active"><a href="#">Right Button Active</a></li>
+          <li class="has-dropdown">
+            <a href="#">Right Button Dropdown</a>
+            <ul class="dropdown">
+              <li><a href="#">First link in dropdown</a></li>
+            </ul>
+          </li>
+        </ul>
+
+      </section>
+    </nav>
+
+    <div class="row">
+
+      <div id="main">
+        <!-- Dynamic html injection -->
+
+      </div>
+
+
+      <a href="#" data-dropdown="drop1">Has Dropdown</a>
+      <ul id="drop1" class="f-dropdown" data-dropdown-content>
+        <li><a href="#">This is a link</a></li>
+        <li><a href="#">This is another</a></li>
+        <li><a href="#">Yet another</a></li>
+      </ul>
+      <a href="#" data-dropdown="drop2">Has Content Dropdown</a>
+      <div id="drop2" data-dropdown-content class="f-dropdown content">
+        <p>Some text that people will think is awesome! Some text that people will think is awesome! Some text that people will think is awesome!</p>
+      </div>
+
     </div>
-
-
-    <a href="#" data-dropdown="drop1">Has Dropdown</a>
-    <ul id="drop1" class="f-dropdown" data-dropdown-content>
-      <li><a href="#">This is a link</a></li>
-      <li><a href="#">This is another</a></li>
-      <li><a href="#">Yet another</a></li>
-    </ul>
-    <a href="#" data-dropdown="drop2">Has Content Dropdown</a>
-    <div id="drop2" data-dropdown-content class="f-dropdown content">
-      <p>Some text that people will think is awesome! Some text that people will think is awesome! Some text that people will think is awesome!</p>
-    </div>
-
 
 
 

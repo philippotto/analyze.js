@@ -182,7 +182,6 @@ foundation : Foundation
 
     render : ->
       R.div {className : "commentBox"},
-        R.h1 null, "Comments"
         CommentList {data : @state.data, onCommentRemove : @handleCommentRemove}
         CommentForm {onCommentSubmit : @handleCommentSubmit}
   )

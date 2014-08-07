@@ -17,6 +17,8 @@ module.exports = (gulp, $, options) ->
       # .pipe($.sourcemaps.write())
       .pipe(gulp.dest(options.dest.scripts))
       .pipe($.logger())
+      .pipe($.browserSync.reload(stream : true))
+
   )
 
   gulp.task("scripts_min", ["scripts"], ->

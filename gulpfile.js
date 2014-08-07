@@ -6,8 +6,11 @@ var gulp, util, path, $;
 try {
   gulp = require("gulp");
 
+
+
   $ = require("gulp-load-plugins")();
 
+  $.browserSync = require("browser-sync");
   $.amdOptimize = require("amd-optimize");
   $.rimraf = require("rimraf");
   $.through = require("through2");

@@ -14,5 +14,6 @@ module.exports = (gulp, $, options) ->
       # .pipe($.sourcemaps.write())
       .pipe(gulp.dest(options.dest.styles))
       .pipe($.logger())
+      .pipe($.browserSync.reload(stream : true))
 
   )

@@ -5,4 +5,6 @@ module.exports = (gulp, $, options) ->
       .pipe($.changed(options.dest.dir))
     	.pipe(gulp.dest(options.dest.dir))
       .pipe($.logger())
+      .pipe($.browserSync.reload(stream : true))
+
   )
