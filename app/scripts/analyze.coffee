@@ -9,21 +9,45 @@ foundation : Foundation
 
   window.FunctionStore =
 
-    functions : []
+    functions : {}
 
-    getOrCreateFunctionByID : (id, params) ->
+    createFunction : (fileName, node) ->
+
+      id = @createID(fileName, node)
 
       unless @functions[id]
-
-        @functions[id] = new JSFunction(id, params)
+        @functions[id] = new JSFunction(id, fileName, node)
 
       return @functions[id]
 
 
+    createID : (fileName, node) ->
+
+      fnName = node.id.name
+      range = node.id.range
+
+      [fileName, fnName, range].join("-")
+
+
+    getFunctionByID : (id) ->
+
+      if fn = @functions[id]
+        return fn
+
+      throw Error("Function could not be found")
+
+
+
   class JSFunction
 
-    constructor : (@id, @params) ->
+    constructor : (@id, @fileName, @node) ->
 
+
+    getSourceString : -> @node.source()
+
+    getFileName : -> @fileName
+
+    getName : -> @node.id.name
 
 
   class InvocationNode
@@ -34,13 +58,18 @@ foundation : Foundation
 
     addChild : (child) ->
       @children.push child
-      child.parent = @
 
     stopInvocation : ->
       @endTime = performance.now()
 
     getTime : ->
       @endTime - @startTime
+
+    getFormattedTime : ->
+      @getTime().toFixed(2) + " ms"
+
+    getFormattedArguments : ->
+      "[#{[].map.call(@params, (el) -> el.toString())}]"
 
 
   class CallGraph
@@ -53,20 +82,20 @@ foundation : Foundation
     pushInvocation : (invocationNode) ->
 
       @activeNode.addChild(invocationNode)
-      invocationNode.parent = @activeNode
+      invocationNode.parentInvocation = @activeNode
       @activeNode = invocationNode
 
     popInvocation : ->
 
       @activeNode.stopInvocation()
-      @activeNode = @activeNode.parent
+      @activeNode = @activeNode.parentInvocation
 
 
 
   class Tracer
     traceEnter : (id, params, context) ->
 
-      jsFunction = FunctionStore.getOrCreateFunctionByID(id)
+      jsFunction = FunctionStore.getFunctionByID(id)
       invocationNode = new InvocationNode(jsFunction, params, context)
 
       callGraph.pushInvocation invocationNode
@@ -83,14 +112,21 @@ foundation : Foundation
 
 
 
-
-  createID = (fileName, fnName, range) ->
-
-    Array.prototype.join.call(arguments, "-")
-
-
   src =
-    string : "function hello(name) { console.log('hello', name); if(name == 'philipp') { hello('tom'); } }"
+    string : """
+      function a(arg1, callee) {
+        if (callee == null)
+          b(arg1, "a is calling");
+      }
+
+      function b(arg1) {
+        c(arg1, "b is calling");
+      }
+
+      function c(arg1) {
+        a(arg1, "c is calling");
+      }
+      """
     fileName : "testFile.js"
 
   window.output = falafel(src.string, (node) ->
@@ -100,139 +136,97 @@ foundation : Foundation
 
     # first two parts of condition could be enough?
     if parent and parent.type is "FunctionDeclaration" and node.type is "BlockStatement"
-      fnID = "'" + createID(src.fileName, parent.id.name, parent.id.range) + "'"
-      jsFunction = FunctionStore.getOrCreateFunctionByID(fnID, parent.params)
-      node.update "{\ntracer.traceEnter(" + fnID + ", arguments, this);\n" + node.source() + ";\ntracer.traceExit(" + fnID + ");\n}"
+      jsFunction = FunctionStore.createFunction(src.fileName, parent)
+      fnID = jsFunction.id
+
+      node.update "{\ntracer.traceEnter('#{fnID}', arguments, this);\n" + node.source() + ";\ntracer.traceExit('#{fnID}');\n}"
 
   )
 
   eval(output.toString())
-  console.log(hello("philipp"), "hi  2")
-  console.log(hello("hans"), "hi  2")
+  a("anArg")
+  a("anArg", "anArg")
 
-  makeIndent = (n) ->
-    new Array(n * 2).join(" ")
-
-  printCallGraph = (node, indention = 0) ->
-
-    node.children.forEach((child) ->
-      console.log(makeIndent(indention), child)
-      printCallGraph(child, indention + 1)
-    )
-
-  console.log("printing callGraph")
-  printCallGraph(callGraph.root)
+  console.log("callGraph", callGraph)
 
 
 
-  if not localStorage.getItem("comments")
-
-    localStorage.setItem("comments", JSON.stringify([
-      {author: "Pete Hunt", text: "This is one comment"}
-      {author: "Jordan Walke", text: "This is *another* comment"}
-    ]))
+  callHistoryData = callGraph.root
 
 
-  addComment = (author, text) ->
+  # ################################################################################################
+  # ################################################## React #######################################
+  # ################################################################################################
 
-    comments = localStorage.getItem("comments")
-    comments = JSON.parse(comments)
-    comments.push({author, text})
-
-    comments = JSON.stringify(comments)
-    localStorage.setItem("comments", comments)
-
-  removeComment = ->
-
-    comments = localStorage.getItem("comments")
-    comments = JSON.parse(comments)
-    comments.splice(-1)
-
-    comments = JSON.stringify(comments)
-    localStorage.setItem("comments", comments)
+  # CallHistory
+  #   InvocationContainer
+  #     Invocation
 
   R = React.DOM
 
-
-  # CommentBox
-  #   CommentList
-  #     Comment
-  #   CommentForm
-
-  CommentBox = React.createClass(
+  CallHistory = React.createClass
 
     getInitialState : ->
-      data : []
-
-    handleCommentRemove : (author, text) ->
-
-      removeComment()
-      @setState data : JSON.parse localStorage.getItem("comments")
-
-    handleCommentSubmit : ({author, text}) ->
-      addComment(author, text)
-      @setState data : JSON.parse localStorage.getItem("comments")
-
+      rootInvocation : {
+        children : []
+        isRoot : true
+        # jsFunction : {id : 0}
+      }
 
     componentDidMount : ->
-      @setState data : JSON.parse localStorage.getItem("comments")
-      # setInterval(=>
-      #   @setState data : JSON.parse localStorage.getItem("comments")
-      # , @props.pollInterval)
+      @setState rootInvocation : callHistoryData
 
     render : ->
-      R.div {className : "commentBox"},
-        CommentList {data : @state.data, onCommentRemove : @handleCommentRemove}
-        CommentForm {onCommentSubmit : @handleCommentSubmit}
-  )
+      R.div {className : "call-history"},
+        InvocationContainer {invocation : @state.rootInvocation}
 
-  CommentList = React.createClass(
+
+  InvocationContainer = React.createClass
     render : ->
-      commentNodes = @props.data.map (comment) =>
-        Comment {author : comment.author, onCommentRemove : @props.onCommentRemove}, comment.text
 
-      R.div {className : "commentList"},
-        commentNodes
-  )
+      invocationNodes = @props.invocation.children.map (invocation) =>
+        InvocationContainer { invocation }
 
-  Comment = React.createClass(
-    remove : ->
-      console.log("remove", arguments)
-      @props.onCommentRemove(@props.author, @props.children.toString())
-
-    render : ->
-      rawMarkup = this.props.children.toString()
-
-      R.div {className : "comment"},
-        R.h2 {className : "commentAuthor", onClick : @remove}, @props.author
-        R.span {dangerouslySetInnerHTML : { __html : rawMarkup}}
-        R.a {href : "#", onClick : @remove}, "Remove"
-  )
+      R.div {className : "invocation-container"},
+        Invocation { invocation : @props.invocation }
+        invocationNodes
 
 
-  CommentForm = React.createClass(
-    handleSubmit : (evt) ->
-      author = @refs.author.getDOMNode().value
-      text = @refs.text.getDOMNode().value
 
-      @props.onCommentSubmit({author, text})
-
-      @refs.author.getDOMNode().value = ''
-      @refs.text.getDOMNode().value = ''
-
-      return false
+  Invocation = React.createClass
 
     render : ->
-      R.form {className : "commentForm", onSubmit : @handleSubmit},
-        R.input {ref : "author", type : "text", placeholder : "Your name"}
-        R.input {ref : "text", type : "text", placeholder : "Say something..."}
-        R.input {type : "submit", value : "Post"}
-  )
+      eval(Object.keys(R).map((k) -> unless k is "var" then "var #{k} = R['#{k}']").join("; "))
+
+      invocation = @props.invocation
+      jsFunction = invocation.jsFunction
+
+      if invocation.isRoot
+        return div {}
+
+      name = jsFunction.getName()
+      time = (invocation.endTime - invocation.startTime)
+
+      div {className : "panel invocation", onClick : @logInvocation},
+        div {className : "pull-right"},
+          jsFunction.getFileName()
+          div {}, invocation.getFormattedTime()
+        h4 {}, name
+        div {}, "Arguments: " + invocation.getFormattedArguments()
+
+        div {}
+          a href : '#', "data-dropdown" : 'drop2',
+            'Function'
+        div id : "drop2", "data-dropdown-content" : true, className : "f-dropdown content",
+          p 'Some text that people will think is awesome! Some text that people will think is awesome! Some text that people will think is awesome!'
+
+    logInvocation : ->
+
+      console.log("invocation",  @props.invocation)
 
 
   DOMroot = document.getElementById('main')
-
   React.renderComponent(
-    CommentBox {url : "comment.json", pollInterval : 100}
+    CallHistory {url : "invocation.json"}
     DOMroot
   )
