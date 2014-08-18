@@ -71,6 +71,9 @@ foundation : Foundation
     getFormattedArguments : ->
       "[#{[].map.call(@params, (el) -> el.toString())}]"
 
+    matches : (query) ->
+      return @jsFunction.getName().indexOf(query) > -1
+
 
   class CallGraph
 
@@ -169,28 +172,31 @@ foundation : Foundation
     getInitialState : ->
       rootInvocation : {
         children : []
-        isRoot : true
-        # jsFunction : {id : 0}
+        isRoot : true,
+        searchQuery : ""
       }
 
     componentDidMount : ->
-      @setState rootInvocation : callHistoryData
+      @setState rootInvocation : callHistoryData, searchQuery : ""
+
+      window.testFn = (p) =>
+        @setState rootInvocation : callHistoryData, searchQuery : p
+
 
     render : ->
       R.div {className : "call-history"},
-        InvocationContainer {invocation : @state.rootInvocation}
+        InvocationContainer {invocation : @state.rootInvocation, searchQuery : @state.searchQuery}
 
 
   InvocationContainer = React.createClass
     render : ->
 
       invocationNodes = @props.invocation.children.map (invocation) =>
-        InvocationContainer { invocation }
+        InvocationContainer { invocation, searchQuery : @props.searchQuery }
 
       R.div {className : "invocation-container"},
-        Invocation { invocation : @props.invocation }
+        Invocation { invocation : @props.invocation, searchQuery : @props.searchQuery }
         invocationNodes
-
 
 
   Invocation = React.createClass
@@ -200,24 +206,32 @@ foundation : Foundation
 
       invocation = @props.invocation
       jsFunction = invocation.jsFunction
+      nullElement = div {}
+
+      console.log("@props.searchQuery",  @props.searchQuery)
 
       if invocation.isRoot
-        return div {}
+        return nullElement
 
       name = jsFunction.getName()
+
+      unless invocation.matches(@props.searchQuery)
+        return nullElement
+
       time = (invocation.endTime - invocation.startTime)
 
       div {className : "panel invocation", onClick : @logInvocation},
         div {className : "pull-right"},
           jsFunction.getFileName()
-          div {}, invocation.getFormattedTime()
+          div {},
+            span {className: "alert label pull-right"}, invocation.getFormattedTime()
         h4 {}, name
         div {}, "Arguments: " + invocation.getFormattedArguments()
 
-        div {}
-          a href : '#', "data-dropdown" : 'drop2',
+        div {},
+          a href : '#', "data-dropdown" : "dropID", ref : "dataDropdown",
             'Function'
-        div id : "drop2", "data-dropdown-content" : true, className : "f-dropdown content",
+        div id : "dropID", "data-dropdown-content" : true, className : "f-dropdown content", ref : "dropdownContent",
           p 'Some text that people will think is awesome! Some text that people will think is awesome! Some text that people will think is awesome!'
 
     logInvocation : ->
