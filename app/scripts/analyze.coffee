@@ -2,22 +2,21 @@
 falafel : falafel
 react : React
 react-bootstrap : ReactBootstrap
+object_viewer : ObjectViewer
 ###
 
 ->
-
-  testcase = "immutable"
 
   window.FunctionStore =
 
     functions : {}
 
-    createFunction : (fileName, node) ->
+    createFunction : (fileName, node, params) ->
 
       id = @createID(fileName, node)
 
       unless @functions[id]
-        @functions[id] = new JSFunction(id, fileName, node)
+        @functions[id] = new JSFunction(id, fileName, node, params)
 
       return @functions[id]
 
@@ -48,7 +47,7 @@ react-bootstrap : ReactBootstrap
 
   class JSFunction
 
-    constructor : (@id, @fileName, @node) ->
+    constructor : (@id, @fileName, @node, @params) ->
 
 
     getSourceString : -> @node.source()
@@ -56,6 +55,8 @@ react-bootstrap : ReactBootstrap
     getFileName : -> @fileName
 
     getName : -> @node.id.name
+
+    getParameters : -> @params
 
     matches : (query) ->
 
@@ -67,14 +68,18 @@ react-bootstrap : ReactBootstrap
 
   class InvocationNode
 
-    constructor : (@jsFunction, @params, @context) ->
+    constructor : (@jsFunction, params, @context) ->
+      if params
+        @params = [].slice.call(params)
+      else
+        @params = []
       @children = []
       @startTime = performance.now()
 
     addChild : (child) ->
       @children.push child
 
-    stopInvocation : ->
+    stopInvocation : (@returnValue, @thrownException) ->
       @endTime = performance.now()
 
     getTime : ->
@@ -83,17 +88,52 @@ react-bootstrap : ReactBootstrap
     getFormattedTime : ->
       @getTime().toFixed(2) + " ms"
 
+    getArguments : ->
+      @params
+
+    getViewableArguments : ->
+
+      # Returns an array where each element is an object in the form of:
+      # parameter : argument
+      # The parameter is a string which is derived by the function parameter list.
+      # The argument is the passed variable.
+      # Mind that you can provide fewer/more arguments than parameters to a function.
+
+      i = -1
+      params = @jsFunction.getParameters()
+      args = @getArguments()
+      viewableArguments = []
+
+      while ++i < params.length
+        el = {}
+        el[params[i]] = args[i]
+
+        viewableArguments.push el
+
+      while ++i < args.length
+        el = {}
+        el["not listed"] = args[i]
+        el
+
+        viewableArguments.push el
+
+      viewableArguments
+
     getFormattedArguments : ->
 
       # TODO: use an object viewer and better abbreviations
 
-      paramsAsStringArray = [].map.call(@params, (el) ->
+      paramsAsStringArray = @params.map (el) ->
         try
-          el.toString()
+          el.toString()[0..10]
         catch e
           (typeof el) + "(couldn't convert to string #{e})"
-      )
+
       "[#{paramsAsStringArray}]"
+
+    getFormattedReturnValue : ->
+
+      @returnValue?.toString?()
 
     matches : (query) ->
 
@@ -121,9 +161,9 @@ react-bootstrap : ReactBootstrap
       invocationNode.parentInvocation = @activeNode
       @activeNode = invocationNode
 
-    popInvocation : ->
+    popInvocation : (returnValue, thrownException) ->
 
-      @activeNode.stopInvocation()
+      @activeNode.stopInvocation(returnValue, thrownException)
       @activeNode = @activeNode.parentInvocation
 
 
@@ -136,35 +176,38 @@ react-bootstrap : ReactBootstrap
 
       callGraph.pushInvocation invocationNode
 
-      console.log "traceEnter was triggered", arguments
+      # console.log "traceEnter was triggered", arguments
 
-    traceExit : (id, returnValue, thrownException = null) ->
-      console.log "traceExit was triggered", arguments
-      callGraph.popInvocation()
+    traceExit : (id, returnValue, thrownException) ->
+      if id != callGraph.activeNode.jsFunction.id
+        # TODO: integrate assertion library
+        console.error("traceExit was called for a different function than traceEnter")
+
+      # console.log "traceExit was triggered", arguments
+      callGraph.popInvocation(returnValue, thrownException)
 
 
   window.tracer = new Tracer()
   window.callGraph = new CallGraph()
 
-  generateCallHistoryData = (src) ->
 
-    window.output = falafel(src.string, (node) ->
-      # console.log "node", node
+  instrumentCode = (codeString, fileName) ->
+
+    falafel(codeString, (node) ->
 
       parent = node.parent
 
       # first two parts of condition could be enough?
       if parent and parent.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
-        jsFunction = FunctionStore.createFunction(src.fileName, parent)
+        paramsAsStringArray = _.invoke(node.parent.params, "source")
+        jsFunction = FunctionStore.createFunction(fileName, parent, paramsAsStringArray)
         fnID = jsFunction.id
-
-        paramsAsStringArray = _.invoke(node.parent.params, "source").join(", ")
 
         node.update """{
                     tracer.traceEnter('#{fnID}', arguments, this);
                     var thrownException = null;
                     try {
-                      var returnValue = (function(#{paramsAsStringArray}) {
+                      var returnValue = (function(#{paramsAsStringArray.join(", ")}) {
                         #{node.source()};
                       }).apply(this, arguments);
                     } catch(ex) {
@@ -175,24 +218,16 @@ react-bootstrap : ReactBootstrap
                       throw thrownException;
                     return returnValue;
                     }"""
-
-
     )
 
-    eval(output.toString())
 
-    # window.callGraph.resetToRoot()
+  generateCallHistoryData = (src) ->
 
-    switch testcase
-      when "immutable"
-        # ...
-        map = Immutable.Map( a : 1, b : 2, c : 3)
-        map.set("d", 4)
-      when "simpleCallHierarchy"
-        a("anArg")
-        a("anArg", "anArg")
-      when "function expression"
-        someObj.fn()
+    instrumentedCode = instrumentCode(src.string, src.fileName)
+    instrumentedTestCode = instrumentCode(src.testString, "test.js")
+
+    eval(instrumentedCode.toString())
+    eval(instrumentedTestCode.toString())
 
     return callGraph.root
 
@@ -248,10 +283,10 @@ react-bootstrap : ReactBootstrap
             R.div className : "form-group",
               R.Input {type: "text", className : "form-control", placeholder: "Search", onChange: @handleSearch, value: @props.searchQuery, ref: "searchInput"}
           R.DropdownButton key:3, title:"Dropdown",
-            R.MenuItem key:"1",
+            R.MenuItem key: "1",
               "Action"
             R.MenuItem divider : true
-            R.MenuItem key:"4",
+            R.MenuItem key: "4",
               "Separated link"
 
 
@@ -259,11 +294,9 @@ react-bootstrap : ReactBootstrap
   CallHistory = React.createClass
 
     getInitialState : ->
-      rootInvocation : {
+      rootInvocation :
         children : []
-        isRoot : true,
-      }
-
+        isRoot : true
 
     render : ->
       R.div {className : "call-history"},
@@ -279,14 +312,13 @@ react-bootstrap : ReactBootstrap
         InvocationContainer { invocation, searchQuery : @props.searchQuery, hidden : @props.hidden or @state.collapsed }
 
       R.div {className : "invocation-container"},
-        Invocation({
-            invocation : @props.invocation
-            searchQuery : @props.searchQuery
-            collapsed : @state.collapsed
-            hidden : @props.hidden
-            toggleCollapsing : @collapse
-
-        })
+        Invocation(
+          invocation : @props.invocation
+          searchQuery : @props.searchQuery
+          collapsed : @state.collapsed
+          hidden : @props.hidden
+          toggleCollapsing : @collapse
+        )
         invocationNodes
 
 
@@ -297,9 +329,7 @@ react-bootstrap : ReactBootstrap
 
     collapse : ->
 
-      console.log("collapse!")
       @setState({collapsed : !@state.collapsed})
-
 
 
 
@@ -314,21 +344,32 @@ react-bootstrap : ReactBootstrap
       if invocation.isRoot
         return div {}
 
-      popoverOverlay = R.Popover {title: "Popover top"}, "Holy moly"
+      popoverOverlay = R.Popover {title: "Arguments"},
+        ObjectViewer { object : invocation.getViewableArguments() }
 
-      R.Panel {className : "invocation", style : @getStyle()},
+
+      Panel {className : "invocation", style : @getStyle()},
         div className : "pull-right",
           div onClick : @logInvocation,
             jsFunction.getFileName()
           div {},
-            R.Label bsStyle: "primary", className: "pull-right",
+            Label bsStyle: "primary", className: "pull-right",
               invocation.getFormattedTime()
         h4 {},
           @getToggler()
           jsFunction.getName()
         div {},
-          R.OverlayTrigger {trigger: "click", placement: "top", overlay : popoverOverlay},
-            div {}, "Arguments: " + invocation.getFormattedArguments()
+          div {},
+            Label bsStyle: "default",
+              "Arguments"
+            OverlayTrigger {trigger: "click", placement: "right", overlay : popoverOverlay},
+              span {},
+                invocation.getFormattedArguments()
+          div {},
+            Label bsStyle: "default",
+              "Return value"
+            span {},
+              invocation.getFormattedReturnValue()
 
 
     getToggler: ->
@@ -353,36 +394,49 @@ react-bootstrap : ReactBootstrap
 
 
 
+  getTestCase = ->
 
-  $.ajax("Immutable.js", {dataType: "text"}).then (immutableCode) ->
+    testcase = "simpleCallHierarchy"
+
     switch testcase
       when "immutable"
-        src =
-          string : immutableCode
-          fileName : "immutable.js"
+        string : immutableCode
+        fileName : "immutable.js"
+        testString : "map = Immutable.Map( a : 1, b : 2, c : 3); map.set('d', 4)"
+
       when "simpleCallHierarchy"
-        src =
-          string : """
-            function a(arg1, callee) {
-              if (callee == null)
-                b(arg1, "a is calling");
-            }
+        string : """
+          function a(arg1, callee) {
+            if (callee == null)
+              b(arg1, "a is calling");
+          }
 
-            function b(arg1) {
-              c(arg1, "b is calling");
-            }
+          function b(arg1) {
+            c(arg1, "b is calling");
+          }
 
-            function c(arg1) {
-              a(arg1, "c is calling");
-            }
-            """
-          fileName : "testFile.js"
+          function c(arg1) {
+            a(arg1, "c is calling");
+          }
+          """
+        fileName : "testFile.js"
+        testString : "a('anArg'); a('anArg', 'anArg');"
+
+      when "parameterCheck"
+        string : """
+          function fn(p1, p2, p3) {}
+        """
+        fileName : "parameterCheck.js"
+        testString : "fn('aString for p1', { obj : 'for p2'})"
+
       when "function expression"
-        src =
-          string : "var someObj = { fn : function() { console.log('someObj was invoked')} }"
-          fileName : "object.js"
+        string : "var someObj = { fn : function() { console.log('someObj was invoked')} }"
+        fileName : "object.js"
+        testString : "someObj.fn();"
 
-    callHistoryData = generateCallHistoryData(src)
+  $.ajax("Immutable.js", {dataType: "text"}).then (immutableCode) ->
+
+    callHistoryData = generateCallHistoryData(getTestCase())
 
     DOMroot = document.getElementById('main')
     React.renderComponent(
