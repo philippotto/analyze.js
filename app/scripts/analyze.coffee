@@ -6,6 +6,8 @@ react-bootstrap : ReactBootstrap
 
 ->
 
+  testcase = "immutable"
+
   window.FunctionStore =
 
     functions : {}
@@ -22,8 +24,15 @@ react-bootstrap : ReactBootstrap
 
     createID : (fileName, node) ->
 
+      if not node.id?
+        node.id =
+          name : "anonymousFn"
+          range : node.range
+
       fnName = node.id.name
+      # TODO: check if node.id.range === node.range
       range = node.id.range
+
 
       [fileName, fnName, range].join("-")
 
@@ -75,7 +84,16 @@ react-bootstrap : ReactBootstrap
       @getTime().toFixed(2) + " ms"
 
     getFormattedArguments : ->
-      "[#{[].map.call(@params, (el) -> el.toString())}]"
+
+      # TODO: use an object viewer and better abbreviations
+
+      paramsAsStringArray = [].map.call(@params, (el) ->
+        try
+          el.toString()
+        catch e
+          (typeof el) + "(couldn't convert to string #{e})"
+      )
+      "[#{paramsAsStringArray}]"
 
     matches : (query) ->
 
@@ -91,6 +109,10 @@ react-bootstrap : ReactBootstrap
     constructor : ->
       @root = new InvocationNode()
       @root.isRoot = true
+      @activeNode = @root
+
+    resetToRoot : ->
+
       @activeNode = @root
 
     pushInvocation : (invocationNode) ->
@@ -116,7 +138,7 @@ react-bootstrap : ReactBootstrap
 
       console.log "traceEnter was triggered", arguments
 
-    traceExit : (id) ->
+    traceExit : (id, returnValue, thrownException = null) ->
       console.log "traceExit was triggered", arguments
       callGraph.popInvocation()
 
@@ -124,47 +146,55 @@ react-bootstrap : ReactBootstrap
   window.tracer = new Tracer()
   window.callGraph = new CallGraph()
 
-  generateCallHistoryData = ->
-
-    src =
-      string : """
-        function a(arg1, callee) {
-          if (callee == null)
-            b(arg1, "a is calling");
-        }
-
-        function b(arg1) {
-          c(arg1, "b is calling");
-        }
-
-        function c(arg1) {
-          a(arg1, "c is calling");
-        }
-        """
-      fileName : "testFile.js"
+  generateCallHistoryData = (src) ->
 
     window.output = falafel(src.string, (node) ->
-      console.log "node", node
+      # console.log "node", node
 
       parent = node.parent
 
       # first two parts of condition could be enough?
-      if parent and parent.type is "FunctionDeclaration" and node.type is "BlockStatement"
+      if parent and parent.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
         jsFunction = FunctionStore.createFunction(src.fileName, parent)
         fnID = jsFunction.id
 
-        node.update "{\ntracer.traceEnter('#{fnID}', arguments, this);\n" + node.source() + ";\ntracer.traceExit('#{fnID}');\n}"
+        paramsAsStringArray = _.invoke(node.parent.params, "source").join(", ")
+
+        node.update """{
+                    tracer.traceEnter('#{fnID}', arguments, this);
+                    var thrownException = null;
+                    try {
+                      var returnValue = (function(#{paramsAsStringArray}) {
+                        #{node.source()};
+                      }).apply(this, arguments);
+                    } catch(ex) {
+                      thrownException = ex;
+                    }
+                    tracer.traceExit('#{fnID}', returnValue, thrownException);
+                    if(thrownException)
+                      throw thrownException;
+                    return returnValue;
+                    }"""
+
 
     )
 
     eval(output.toString())
-    a("anArg")
-    a("anArg", "anArg")
 
-    callGraph.root
+    # window.callGraph.resetToRoot()
 
+    switch testcase
+      when "immutable"
+        # ...
+        map = Immutable.Map( a : 1, b : 2, c : 3)
+        map.set("d", 4)
+      when "simpleCallHierarchy"
+        a("anArg")
+        a("anArg", "anArg")
+      when "function expression"
+        someObj.fn()
 
-  callHistoryData = generateCallHistoryData()
+    return callGraph.root
 
 
   # ################################################################################################
@@ -183,12 +213,12 @@ react-bootstrap : ReactBootstrap
     getInitialState : ->
 
       searchQuery : ""
-      callHistoryData : callHistoryData
+
 
 
     handleSearch : (searchQuery) ->
 
-      @setState {searchQuery, callHistoryData}
+      @setState {searchQuery}
 
 
     render : ->
@@ -196,7 +226,7 @@ react-bootstrap : ReactBootstrap
       R.div {},
         Navigation { onSearch : @handleSearch, searchQuery : @state.searchQuery }
         R.div {className : "container"},
-          CallHistory { searchQuery : @state.searchQuery, callHistoryData : @state.callHistoryData }
+          CallHistory { searchQuery : @state.searchQuery, callHistoryData : @props.callHistoryData }
 
 
 
@@ -323,8 +353,39 @@ react-bootstrap : ReactBootstrap
 
 
 
-  DOMroot = document.getElementById('main')
-  React.renderComponent(
-    App {}
-    DOMroot
-  )
+
+  $.ajax("Immutable.js", {dataType: "text"}).then (immutableCode) ->
+    switch testcase
+      when "immutable"
+        src =
+          string : immutableCode
+          fileName : "immutable.js"
+      when "simpleCallHierarchy"
+        src =
+          string : """
+            function a(arg1, callee) {
+              if (callee == null)
+                b(arg1, "a is calling");
+            }
+
+            function b(arg1) {
+              c(arg1, "b is calling");
+            }
+
+            function c(arg1) {
+              a(arg1, "c is calling");
+            }
+            """
+          fileName : "testFile.js"
+      when "function expression"
+        src =
+          string : "var someObj = { fn : function() { console.log('someObj was invoked')} }"
+          fileName : "object.js"
+
+    callHistoryData = generateCallHistoryData(src)
+
+    DOMroot = document.getElementById('main')
+    React.renderComponent(
+      App {callHistoryData}
+      DOMroot
+    )
