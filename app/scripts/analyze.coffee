@@ -1,11 +1,10 @@
 ### define
 falafel : falafel
 react : React
-foundation : Foundation
+react-bootstrap : ReactBootstrap
 ###
 
 ->
-  $(document).foundation()
 
   window.FunctionStore =
 
@@ -49,6 +48,13 @@ foundation : Foundation
 
     getName : -> @node.id.name
 
+    matches : (query) ->
+
+      _.any([@getName(), @getFileName()], (property) ->
+        property.toLowerCase().indexOf(query.toLowerCase()) > -1
+      )
+
+
 
   class InvocationNode
 
@@ -72,7 +78,8 @@ foundation : Foundation
       "[#{[].map.call(@params, (el) -> el.toString())}]"
 
     matches : (query) ->
-      return @jsFunction.getName().indexOf(query) > -1
+
+      return @jsFunction.matches(query)
 
 
   class CallGraph
@@ -113,48 +120,47 @@ foundation : Foundation
   window.tracer = new Tracer()
   window.callGraph = new CallGraph()
 
+  generateCallHistoryData = ->
+
+    src =
+      string : """
+        function a(arg1, callee) {
+          if (callee == null)
+            b(arg1, "a is calling");
+        }
+
+        function b(arg1) {
+          c(arg1, "b is calling");
+        }
+
+        function c(arg1) {
+          a(arg1, "c is calling");
+        }
+        """
+      fileName : "testFile.js"
+
+    window.output = falafel(src.string, (node) ->
+      console.log "node", node
+
+      parent = node.parent
+
+      # first two parts of condition could be enough?
+      if parent and parent.type is "FunctionDeclaration" and node.type is "BlockStatement"
+        jsFunction = FunctionStore.createFunction(src.fileName, parent)
+        fnID = jsFunction.id
+
+        node.update "{\ntracer.traceEnter('#{fnID}', arguments, this);\n" + node.source() + ";\ntracer.traceExit('#{fnID}');\n}"
+
+    )
+
+    eval(output.toString())
+    a("anArg")
+    a("anArg", "anArg")
+
+    callGraph.root
 
 
-  src =
-    string : """
-      function a(arg1, callee) {
-        if (callee == null)
-          b(arg1, "a is calling");
-      }
-
-      function b(arg1) {
-        c(arg1, "b is calling");
-      }
-
-      function c(arg1) {
-        a(arg1, "c is calling");
-      }
-      """
-    fileName : "testFile.js"
-
-  window.output = falafel(src.string, (node) ->
-    console.log "node", node
-
-    parent = node.parent
-
-    # first two parts of condition could be enough?
-    if parent and parent.type is "FunctionDeclaration" and node.type is "BlockStatement"
-      jsFunction = FunctionStore.createFunction(src.fileName, parent)
-      fnID = jsFunction.id
-
-      node.update "{\ntracer.traceEnter('#{fnID}', arguments, this);\n" + node.source() + ";\ntracer.traceExit('#{fnID}');\n}"
-
-  )
-
-  eval(output.toString())
-  a("anArg")
-  a("anArg", "anArg")
-
-  console.log("callGraph", callGraph)
-
-
-
-  callHistoryData = callGraph.root
+  callHistoryData = generateCallHistoryData()
 
 
   # ################################################################################################
@@ -165,7 +171,56 @@ foundation : Foundation
   #   InvocationContainer
   #     Invocation
 
-  R = React.DOM
+
+  R = _.merge(_.merge({}, ReactBootstrap), React.DOM)
+
+  App = React.createClass
+
+    getInitialState : ->
+
+      searchQuery : ""
+      callHistoryData : callHistoryData
+
+
+    handleSearch : (searchQuery) ->
+
+      @setState {searchQuery, callHistoryData}
+
+
+    render : ->
+
+      R.div {},
+        Navigation { onSearch : @handleSearch, searchQuery : @state.searchQuery }
+        R.div {className : "container"},
+          CallHistory { searchQuery : @state.searchQuery, callHistoryData : @state.callHistoryData }
+
+
+
+  Navigation = React.createClass
+
+    handleSearch : ->
+
+      searchQuery = @refs.searchInput.getValue()
+      @props.onSearch(searchQuery)
+
+    render : ->
+
+      brand = R.a href:"#", className:"navbar-brand",
+        "analyze.js"
+
+      R.Navbar {inverse: true, brand},
+        R.Nav {},
+          R.form className : "navbar-form navbar-left", role : "search",
+            R.div className : "form-group",
+              R.Input {type: "text", className : "form-control", placeholder: "Search", onChange: @handleSearch, value: @props.searchQuery, ref: "searchInput"}
+          R.DropdownButton key:3, title:"Dropdown",
+            R.MenuItem key:"1",
+              "Action"
+            R.MenuItem divider : true
+            R.MenuItem key:"4",
+              "Separated link"
+
+
 
   CallHistory = React.createClass
 
@@ -173,19 +228,13 @@ foundation : Foundation
       rootInvocation : {
         children : []
         isRoot : true,
-        searchQuery : ""
       }
-
-    componentDidMount : ->
-      @setState rootInvocation : callHistoryData, searchQuery : ""
-
-      window.testFn = (p) =>
-        @setState rootInvocation : callHistoryData, searchQuery : p
 
 
     render : ->
       R.div {className : "call-history"},
-        InvocationContainer {invocation : @state.rootInvocation, searchQuery : @state.searchQuery}
+        InvocationContainer {invocation : @props.callHistoryData, searchQuery : @props.searchQuery}
+
 
 
   InvocationContainer = React.createClass
@@ -197,6 +246,7 @@ foundation : Foundation
       R.div {className : "invocation-container"},
         Invocation { invocation : @props.invocation, searchQuery : @props.searchQuery }
         invocationNodes
+
 
 
   Invocation = React.createClass
@@ -220,19 +270,20 @@ foundation : Foundation
 
       time = (invocation.endTime - invocation.startTime)
 
-      div {className : "panel invocation", onClick : @logInvocation},
+
+      popoverOverlay = R.Popover {title: "Popover top"}, "Holy moly"
+
+      R.Panel {className : "invocation", onClick : @logInvocation},
         div {className : "pull-right"},
           jsFunction.getFileName()
           div {},
-            span {className: "alert label pull-right"}, invocation.getFormattedTime()
+            R.Label bsStyle: "primary", className: "pull-right",
+              invocation.getFormattedTime()
         h4 {}, name
-        div {}, "Arguments: " + invocation.getFormattedArguments()
-
         div {},
-          a href : '#', "data-dropdown" : "dropID", ref : "dataDropdown",
-            'Function'
-        div id : "dropID", "data-dropdown-content" : true, className : "f-dropdown content", ref : "dropdownContent",
-          p 'Some text that people will think is awesome! Some text that people will think is awesome! Some text that people will think is awesome!'
+          R.OverlayTrigger {trigger: "click", placement: "top", overlay : popoverOverlay},
+            div {}, "Arguments: " + invocation.getFormattedArguments()
+
 
     logInvocation : ->
 
@@ -241,6 +292,6 @@ foundation : Foundation
 
   DOMroot = document.getElementById('main')
   React.renderComponent(
-    CallHistory {url : "invocation.json"}
+    App {}
     DOMroot
   )

@@ -11,7 +11,8 @@ require.config(
     falafel : "../bower_components/falafel/index"
     esprima : "../bower_components/esprima/esprima"
     react : "../bower_components/react/react"
-    foundation : "../bower_components/foundation/js/foundation"
+    "react-bootstrap" : "../bower_components/react-bootstrap/react-bootstrap"
+    # foundation : "../bower_components/foundation/js/foundation"
 
   map :
     backbone :

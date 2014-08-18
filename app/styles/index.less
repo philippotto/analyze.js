@@ -1,6 +1,6 @@
-// @import "bower_components/bootstrap/less/bootstrap.less";
-@import (less) "bower_components/foundation/css/foundation.css";
-@import (less) "bower_components/foundation/css/normalize.css";
+@import "bower_components/bootstrap/less/bootstrap.less";
+// @import (less) "bower_components/foundation/css/foundation.css";
+// @import (less) "bower_components/foundation/css/normalize.css";
 @import "bower_components/font-awesome/less/font-awesome.less";
 
 h1 {
@@ -9,8 +9,7 @@ h1 {
 
 .call-history {
   margin-left: -15px;
-  overflow: auto;
-}
+  overflow: auto; }
 
 .invocation-container {
   margin-left: 15px;
@@ -18,4 +17,36 @@ h1 {
 
 .invocation {
   margin-bottom: 10px;
+}
+
+
+/* Base styles (regardless of theme) */
+.bs-callout {
+  margin: 20px 0;
+  padding: 15px 30px 15px 15px;
+  border-left: 5px solid #eee;
+}
+.bs-callout h4 {
+  margin-top: 0;
+}
+.bs-callout p:last-child {
+  margin-bottom: 0;
+}
+.bs-callout code,
+.bs-callout .highlight {
+  background-color: #fff;
+}
+
+/* Themes for different contexts */
+.bs-callout-danger {
+  background-color: #fcf2f2;
+  border-color: #dFb5b4;
+}
+.bs-callout-warning {
+  background-color: #fefbed;
+  border-color: #f1e7bc;
+}
+.bs-callout-info {
+  background-color: #f0f7fd;
+  border-color: #d0e3f0;
 }
