@@ -81,6 +81,10 @@ react-bootstrap : ReactBootstrap
 
       return @jsFunction.matches(query)
 
+    hasChildren : ->
+
+      @children.length
+
 
   class CallGraph
 
@@ -233,19 +237,39 @@ react-bootstrap : ReactBootstrap
 
     render : ->
       R.div {className : "call-history"},
-        InvocationContainer {invocation : @props.callHistoryData, searchQuery : @props.searchQuery}
+        InvocationContainer {invocation : @props.callHistoryData, searchQuery : @props.searchQuery, collapsed : false, hidden : false}
 
 
 
   InvocationContainer = React.createClass
+
     render : ->
 
       invocationNodes = @props.invocation.children.map (invocation) =>
-        InvocationContainer { invocation, searchQuery : @props.searchQuery }
+        InvocationContainer { invocation, searchQuery : @props.searchQuery, hidden : @props.hidden or @state.collapsed }
 
       R.div {className : "invocation-container"},
-        Invocation { invocation : @props.invocation, searchQuery : @props.searchQuery }
+        Invocation({
+            invocation : @props.invocation
+            searchQuery : @props.searchQuery
+            collapsed : @state.collapsed
+            hidden : @props.hidden
+            toggleCollapsing : @collapse
+
+        })
         invocationNodes
+
+
+    getInitialState : ->
+
+      collapsed : false
+
+
+    collapse : ->
+
+      console.log("collapse!")
+      @setState({collapsed : !@state.collapsed})
+
 
 
 
@@ -256,38 +280,47 @@ react-bootstrap : ReactBootstrap
 
       invocation = @props.invocation
       jsFunction = invocation.jsFunction
-      nullElement = div {}
-
-      console.log("@props.searchQuery",  @props.searchQuery)
 
       if invocation.isRoot
-        return nullElement
-
-      name = jsFunction.getName()
-
-      unless invocation.matches(@props.searchQuery)
-        return nullElement
-
-      time = (invocation.endTime - invocation.startTime)
-
+        return div {}
 
       popoverOverlay = R.Popover {title: "Popover top"}, "Holy moly"
 
-      R.Panel {className : "invocation", onClick : @logInvocation},
-        div {className : "pull-right"},
-          jsFunction.getFileName()
+      R.Panel {className : "invocation", style : @getStyle()},
+        div className : "pull-right",
+          div onClick : @logInvocation,
+            jsFunction.getFileName()
           div {},
             R.Label bsStyle: "primary", className: "pull-right",
               invocation.getFormattedTime()
-        h4 {}, name
+        h4 {},
+          @getToggler()
+          jsFunction.getName()
         div {},
           R.OverlayTrigger {trigger: "click", placement: "top", overlay : popoverOverlay},
             div {}, "Arguments: " + invocation.getFormattedArguments()
 
 
+    getToggler: ->
+
+      if @props.invocation.hasChildren()
+        R.div {
+          className: "triangle " + if @props.collapsed then "closed" else "open"
+          ref : "collapseToggler"
+          onClick : @props.toggleCollapsing
+        }
+
+
+    getStyle: ->
+
+      matches = @props.invocation.matches(@props.searchQuery)
+      return display : if matches and not @props.hidden then "block" else "none"
+
+
     logInvocation : ->
 
       console.log("invocation",  @props.invocation)
+
 
 
   DOMroot = document.getElementById('main')
