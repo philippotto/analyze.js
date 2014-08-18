@@ -110,6 +110,8 @@ object_viewer : ObjectViewer
 
         viewableArguments.push el
 
+      i--
+
       while ++i < args.length
         el = {}
         el["not listed"] = args[i]
@@ -183,7 +185,6 @@ object_viewer : ObjectViewer
         # TODO: integrate assertion library
         console.error("traceExit was called for a different function than traceEnter")
 
-      # console.log "traceExit was triggered", arguments
       callGraph.popInvocation(returnValue, thrownException)
 
 
@@ -433,6 +434,7 @@ object_viewer : ObjectViewer
         string : "var someObj = { fn : function() { console.log('someObj was invoked')} }"
         fileName : "object.js"
         testString : "someObj.fn();"
+
 
   $.ajax("Immutable.js", {dataType: "text"}).then (immutableCode) ->
 
