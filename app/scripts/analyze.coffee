@@ -103,6 +103,9 @@ object_viewer : ObjectViewer
     getArguments : ->
       @params
 
+    getContext : ->
+      @context
+
     getViewableArguments : ->
 
       # Returns an array where each element is an object in the form of:
@@ -394,6 +397,11 @@ object_viewer : ObjectViewer
               "Return value"
             span {onClick : -> console.log(invocation.getReturnValue())},
               invocation.getFormattedReturnValue()
+          div {},
+            Label bsStyle: "default",
+              "Context"
+            span {onClick : -> console.log(invocation.getContext())},
+              "this"
           div {},
             if invocation.changesDOM() then Label bsStyle: "warning", "Changes DOM"
 
