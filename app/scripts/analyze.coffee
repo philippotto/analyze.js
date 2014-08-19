@@ -2,6 +2,7 @@
 falafel : falafel
 react : React
 react-bootstrap : ReactBootstrap
+with_react : withReact
 object_viewer : ObjectViewer
 ###
 
@@ -75,12 +76,19 @@ object_viewer : ObjectViewer
         @params = []
       @children = []
       @startTime = performance.now()
+      @changedDOM = false
 
     addChild : (child) ->
       @children.push child
 
     stopInvocation : (@returnValue, @thrownException) ->
       @endTime = performance.now()
+
+    changesDOM : (bool) ->
+      if arguments.length == 0
+        return @changedDOM
+      else
+        @changedDOM = bool
 
     getTime : ->
       @endTime - @startTime
@@ -133,6 +141,10 @@ object_viewer : ObjectViewer
 
       "[#{paramsAsStringArray}]"
 
+    getReturnValue : ->
+
+      @returnValue
+
     getFormattedReturnValue : ->
 
       @returnValue?.toString?()
@@ -168,28 +180,37 @@ object_viewer : ObjectViewer
       @activeNode.stopInvocation(returnValue, thrownException)
       @activeNode = @activeNode.parentInvocation
 
+    registerDOMModification : =>
+
+      @activeNode?.changesDOM(true)
 
 
   class Tracer
+
+    constructor : (@callGraph, listenToDOMModifications) ->
+
+      if listenToDOMModifications
+        document.addEventListener("DOMSubtreeModified", @callGraph.registerDOMModification, false);
+
+
     traceEnter : (id, params, context) ->
 
       jsFunction = FunctionStore.getFunctionByID(id)
       invocationNode = new InvocationNode(jsFunction, params, context)
 
-      callGraph.pushInvocation invocationNode
+      @callGraph.pushInvocation invocationNode
 
-      # console.log "traceEnter was triggered", arguments
 
     traceExit : (id, returnValue, thrownException) ->
-      if id != callGraph.activeNode.jsFunction.id
+      if id != @callGraph.activeNode.jsFunction.id
         # TODO: integrate assertion library
         console.error("traceExit was called for a different function than traceEnter")
 
-      callGraph.popInvocation(returnValue, thrownException)
+      @callGraph.popInvocation(returnValue, thrownException)
 
 
-  window.tracer = new Tracer()
   window.callGraph = new CallGraph()
+  window.tracer = new Tracer(window.callGraph, true)
 
 
   instrumentCode = (codeString, fileName) ->
@@ -242,7 +263,7 @@ object_viewer : ObjectViewer
   #     Invocation
 
 
-  R = _.merge(_.merge({}, ReactBootstrap), React.DOM)
+  R = withReact.R
 
   App = React.createClass
 
@@ -337,7 +358,7 @@ object_viewer : ObjectViewer
   Invocation = React.createClass
 
     render : ->
-      eval(Object.keys(R).map((k) -> unless k is "var" then "var #{k} = R['#{k}']").join("; "))
+      eval(withReact.import)
 
       invocation = @props.invocation
       jsFunction = invocation.jsFunction
@@ -369,8 +390,11 @@ object_viewer : ObjectViewer
           div {},
             Label bsStyle: "default",
               "Return value"
-            span {},
+            span {onClick : -> console.log(invocation.getReturnValue())},
               invocation.getFormattedReturnValue()
+          div {},
+            if invocation.changesDOM() then Label bsStyle: "warning", "Changes DOM"
+
 
 
     getToggler: ->
@@ -409,15 +433,19 @@ object_viewer : ObjectViewer
         string : """
           function a(arg1, callee) {
             if (callee == null)
-              b(arg1, "a is calling");
+              return "a" + b(arg1, "a is calling");
+            return "a";
           }
 
           function b(arg1) {
-            c(arg1, "b is calling");
+            var mytext=document.createTextNode("some text");
+            console.log("going to change the dom");
+            document.body.appendChild(mytext);
+            return "b" + c(arg1, "b is calling");
           }
 
           function c(arg1) {
-            a(arg1, "c is calling");
+            return "c" + a(arg1, "c is calling");
           }
           """
         fileName : "testFile.js"

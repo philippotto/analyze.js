@@ -1,11 +1,9 @@
 ### define
 react : React
 react-bootstrap : ReactBootstrap
+with_react : withReact
 ###
 
-
-R = _.merge(_.merge({}, ReactBootstrap), React.DOM)
-eval(Object.keys(R).map((k) -> unless k is "var" then "var #{k} = R['#{k}']").join("; "))
 
 ObjectViewer = React.createClass
 
@@ -27,12 +25,14 @@ ObjectViewer = React.createClass
 
   getElementsForObject : (obj) ->
 
+    eval(withReact.import)
     for own prop, value of obj
-      li {},
+      li { onClick : -> console.log(value) },
         "#{prop} : #{@formatValue value}"
 
   render : ->
 
+    eval(withReact.import)
     obj = @props.object
 
     children = obj.map(@getElementsForObject)
