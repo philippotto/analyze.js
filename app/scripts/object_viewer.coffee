@@ -4,6 +4,16 @@ react-bootstrap : ReactBootstrap
 with_react : withReact
 ###
 
+Formatter =
+  formatValue : (value) ->
+
+    switch typeof value
+      when "string" then "\"#{value}\""
+      when "function" then "function"
+      when "object" then "object"
+      when "number" then value
+      else value
+
 
 ObjectViewer = React.createClass
 
@@ -15,20 +25,12 @@ ObjectViewer = React.createClass
 
     @setState {searchQuery}
 
-  formatValue : (value) ->
-
-    switch typeof value
-      when "string" then "\"#{value}\""
-      when "function" then "function"
-      when "object" then "object"
-
-
   getElementsForObject : (obj) ->
 
     eval(withReact.import)
     for own prop, value of obj
       li { onClick : -> console.log(value) },
-        "#{prop} : #{@formatValue value}"
+        "#{prop} : #{Formatter.formatValue value}"
 
   render : ->
 
@@ -47,5 +49,7 @@ ObjectViewer = React.createClass
       children
 
 
+# find a better way to expose the Formatter
+ObjectViewer.Formatter = Formatter
 
 ObjectViewer
