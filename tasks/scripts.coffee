@@ -1,4 +1,5 @@
 path = require("path")
+
 module.exports = (gulp, $, options) ->
 
   gulp.task("scripts", ->
@@ -11,7 +12,7 @@ module.exports = (gulp, $, options) ->
       # .pipe($.sourcemaps.init())
       .pipe($.if(
         (file) -> return path.extname(file.path) == ".coffee"
-        $.coffee()
+        $.coffee().on("error", $.handleError)
       ))
       .on("error", $.handleError)
       # .pipe($.sourcemaps.write())

@@ -33,6 +33,9 @@ var options = require("./gulp_options.json");
 $.handleError = function (err) {
   util.log(util.colors.red("!!"), err.toString());
   util.beep();
+  if (this.end) {
+    this.end();
+  }
 }
 
 $.logger = function () {
