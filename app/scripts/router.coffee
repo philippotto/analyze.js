@@ -19,8 +19,7 @@ class Router extends UberRouter
 
     view = new Backbone.View()
     view.render()
-    view.$el.html("What up!")
+    view.$el.html("")
     @changeView(view)
 
-    # console.log("Analyze",  Analyze)
     Analyze()

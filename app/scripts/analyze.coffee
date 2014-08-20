@@ -226,7 +226,7 @@ object_viewer : ObjectViewer
       parent = node.parent
 
       # first two parts of condition could be enough?
-      if parent and parent.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
+      if parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
         paramsAsStringArray = _.invoke(node.parent.params, "source")
         jsFunction = FunctionStore.createFunction(fileName, parent, paramsAsStringArray)
         fnID = jsFunction.id
@@ -276,7 +276,7 @@ object_viewer : ObjectViewer
     getInitialState : ->
 
       searchQuery : ""
-
+      narrowCallHistory : false
 
 
     handleSearch : (searchQuery) ->
@@ -284,12 +284,22 @@ object_viewer : ObjectViewer
       @setState {searchQuery}
 
 
+    toggleNarrowCallHistory : ->
+
+      # TODO: immutable.js ?
+      @state.narrowCallHistory = !@state.narrowCallHistory
+      @setState @state
+
     render : ->
 
-      R.div {},
+      R.div {onClick : @toggleNarrowCallHistory},
         Navigation { onSearch : @handleSearch, searchQuery : @state.searchQuery }
         R.div {className : "container"},
-          CallHistory { searchQuery : @state.searchQuery, callHistoryData : @props.callHistoryData }
+          CallHistory {
+            searchQuery : @state.searchQuery
+            callHistoryData : @props.callHistoryData
+            narrowCallHistory : @state.narrowCallHistory
+          }
 
 
 
@@ -309,7 +319,14 @@ object_viewer : ObjectViewer
         R.Nav {},
           R.form className : "navbar-form navbar-left", role : "search",
             R.div className : "form-group",
-              R.Input {type: "text", className : "form-control", placeholder: "Search", onChange: @handleSearch, value: @props.searchQuery, ref: "searchInput"}
+              R.Input {
+                type: "text"
+                className : "form-control"
+                placeholder: "Search"
+                onChange: @handleSearch
+                value: @props.searchQuery
+                ref: "searchInput"
+              }
           R.DropdownButton key:3, title:"Dropdown",
             R.MenuItem key: "1",
               "Action"
@@ -322,13 +339,23 @@ object_viewer : ObjectViewer
   CallHistory = React.createClass
 
     getInitialState : ->
+
       rootInvocation :
         children : []
         isRoot : true
 
+
     render : ->
-      R.div {className : "call-history"},
-        InvocationContainer {invocation : @props.callHistoryData, searchQuery : @props.searchQuery, collapsed : false, hidden : false}
+
+      additionalClass = if @props.narrowCallHistory then "callhistory-narrow" else ""
+
+      R.div {className : "call-history " + additionalClass},
+        InvocationContainer {
+          invocation : @props.callHistoryData
+          searchQuery : @props.searchQuery
+          collapsed : false
+          hidden : false
+        }
 
 
 
