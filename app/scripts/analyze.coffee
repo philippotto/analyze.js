@@ -164,6 +164,7 @@ object_viewer : ObjectViewer
   class CallGraph
 
     constructor : ->
+      @invocationIDCounter = 0
       @root = new InvocationNode()
       @root.isRoot = true
       @activeNode = @root
@@ -174,6 +175,8 @@ object_viewer : ObjectViewer
 
     pushInvocation : (invocationNode) ->
 
+      # TODO: find a better place for the id
+      invocationNode.id = @invocationIDCounter++
       @activeNode.addChild(invocationNode)
       invocationNode.parentInvocation = @activeNode
       @activeNode = invocationNode
@@ -334,7 +337,12 @@ object_viewer : ObjectViewer
     render : ->
 
       invocationNodes = @props.invocation.children.map (invocation) =>
-        InvocationContainer { invocation, searchQuery : @props.searchQuery, hidden : @props.hidden or @state.collapsed }
+        InvocationContainer {
+          invocation
+          searchQuery : @props.searchQuery
+          hidden : @props.hidden or @state.collapsed
+          key : "invocation-container-" + invocation.id
+        }
 
       R.div {className : "invocation-container"},
         Invocation(
