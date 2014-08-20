@@ -332,7 +332,11 @@ object_viewer : ObjectViewer
 
 
 
+  PureRenderMixin = React.addons.PureRenderMixin
+
   InvocationContainer = React.createClass
+
+    mixins: [PureRenderMixin]
 
     render : ->
 
