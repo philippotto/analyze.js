@@ -1,4 +1,5 @@
 @import "bower_components/bootstrap/less/bootstrap.less";
+// @import "main.css";
 // @import (less) "bower_components/foundation/css/foundation.css";
 // @import (less) "bower_components/foundation/css/normalize.css";
 @import "bower_components/font-awesome/less/font-awesome.less";
@@ -19,6 +20,10 @@ h1 {
   margin-left: -250px;
 }
 
+.function-name {
+  font-weight: bold;
+}
+
 .invocation-container {
   margin-left: 15px;
 }
@@ -32,6 +37,21 @@ h1 {
   border-color: #D5EDFF;
 }
 
+.circle {
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin-left: 10px;
+  margin-top: 3px;
+}
+
+.slow {
+  background-color: @brand-warning;
+}
+
+.fast {
+  background-color: @brand-success;
+}
 
 .triangle {
   display: inline-block;

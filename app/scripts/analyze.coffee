@@ -292,7 +292,7 @@ object_viewer : ObjectViewer
 
     render : ->
 
-      R.div {onClick : @toggleNarrowCallHistory},
+      R.div {},
         Navigation { onSearch : @handleSearch, searchQuery : @state.searchQuery }
         R.div {className : "container"},
           CallHistory {
@@ -365,6 +365,11 @@ object_viewer : ObjectViewer
 
     mixins: [PureRenderMixin]
 
+    getInitialState : ->
+
+      collapsed : false
+
+
     render : ->
 
       invocationNodes = @props.invocation.children.map (invocation) =>
@@ -391,10 +396,10 @@ object_viewer : ObjectViewer
       collapsed : false
 
 
-    collapse : ->
+    collapse : (evt) ->
 
+      evt.stopPropagation()
       @setState({collapsed : !@state.collapsed})
-
 
 
   Invocation = React.createClass
@@ -412,40 +417,39 @@ object_viewer : ObjectViewer
         ObjectViewer { object : invocation.getViewableArguments() }
 
 
-      Panel {className : "invocation", style : @getStyle()},
+      div className : "invocation", style : @getStyle(), onDoubleClick : @props.toggleCollapsing,
         div className : "pull-right",
           div onClick : @logInvocation,
             jsFunction.getFileName()
-          div {},
-            Label bsStyle: "primary", className: "pull-right",
-              @formatTime(invocation.getPureTime())
-            Label bsStyle: "primary", className: "pull-right",
-              @formatTime(invocation.getTotalTime())
-        h4 {},
-          @getToggler()
-          jsFunction.getName()
+            @getTimeMarker(invocation)
         div {},
-          div {},
-            Label bsStyle: "default",
-              "Arguments"
+          @getToggler()
+          span className : "function-name",
+            jsFunction.getName()
+          span {},
             OverlayTrigger {trigger: "click", placement: "right", overlay : popoverOverlay},
               span {},
-                invocation.getFormattedArguments()
-          div {},
-            Label bsStyle: "default",
-              "Return value"
-            span {onClick : -> console.log(invocation.getReturnValue())},
-              invocation.getFormattedReturnValue()
-          div {},
-            Label bsStyle: "default",
-              "Context"
-            span {onClick : -> console.log(invocation.getContext())},
-              "this"
-          div {},
+                "(#{invocation.getFormattedArguments()})"
+          span {onClick : -> console.log(invocation.getReturnValue())},
+              " → " + invocation.getFormattedReturnValue()
+          em {onClick : -> console.log(invocation.getContext())},
+              " context"
+          span {},
             if invocation.changesDOM() then Label bsStyle: "warning", "Changes DOM"
 
 
     formatTime : (t) -> t.toFixed(2) + " ms"
+
+    getTimeMarker: (invocation) ->
+      eval(withReact.import)
+
+      timeTooltip = Tooltip {},
+        div {}, "Total time: " + @formatTime invocation.getTotalTime()
+        div {}, "Pure time: " + @formatTime invocation.getPureTime()
+
+      OverlayTrigger {trigger: "hover", placement: "right", overlay : timeTooltip},
+        div className : "circle pull-right " + if invocation.getTotalTime() > 0 then "slow" else "fast"
+
 
     getToggler: ->
 
