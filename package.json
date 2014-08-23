@@ -33,8 +33,7 @@
     "util": "^0.10.3",
     "colors": "^0.6.2",
     "http": "0.0.0",
-    "connect": "^2.25.7",
-    "connect-static-transform": "^0.7.0"
+    "connect": "^2.25.7"
   },
   "scripts": {
     "postinstall": "bower install && gulp"

@@ -2,7 +2,6 @@ var util = require('util'),
     colors = require('colors'),
     http = require('http'),
     connect = require('connect'),
-    st = require('connect-static-transform'),
     httpProxy = require('http-proxy');
 
 var proxiedPort = 3000;
