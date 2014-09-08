@@ -1,5 +1,4 @@
 ### define
-falafel : falafel
 react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
@@ -12,51 +11,6 @@ instrumentation/Tracer : Tracer
 ###
 
 ->
-
-  window.callGraph = new CallGraph()
-  window.tracer = new Tracer(window.callGraph, true)
-
-
-  instrumentCode = (codeString, fileName) ->
-
-    falafel(codeString, (node) ->
-
-      parent = node.parent
-
-      # first two parts of condition could be enough?
-      if parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
-        paramsAsStringArray = _.invoke(node.parent.params, "source")
-        jsFunction = FunctionStore.createFunction(fileName, parent, paramsAsStringArray)
-        fnID = jsFunction.id
-
-        node.update """{
-                    tracer.traceEnter('#{fnID}', arguments, this);
-                    var thrownException = null;
-                    try {
-                      var returnValue = (function(#{paramsAsStringArray.join(", ")}) {
-                        #{node.source()};
-                      }).apply(this, arguments);
-                    } catch(ex) {
-                      thrownException = ex;
-                    }
-                    tracer.traceExit('#{fnID}', returnValue, thrownException);
-                    if(thrownException)
-                      throw thrownException;
-                    return returnValue;
-                    }"""
-    )
-
-
-  generateCallHistoryData = (src) ->
-
-    instrumentedCode = instrumentCode(src.string, src.fileName)
-    instrumentedTestCode = instrumentCode(src.testString, "test.js")
-
-    eval(instrumentedCode.toString())
-    eval(instrumentedTestCode.toString())
-
-    return callGraph.root
-
 
   # ################################################################################################
   # ################################################## React #######################################
@@ -270,6 +224,17 @@ instrumentation/Tracer : Tracer
       console.log("invocation",  @props.invocation)
 
 
+########### Backend ###########
+
+  generateCallHistoryData = (src) ->
+
+    # instrumentedCode = instrumentCode(src.string, src.fileName)
+    # instrumentedTestCode = instrumentCode(src.testString, "test.js")
+
+    # eval(instrumentedCode.toString())
+    # eval(instrumentedTestCode.toString())
+
+    return callGraph.root
 
 
 
@@ -326,11 +291,16 @@ instrumentation/Tracer : Tracer
     )
 
 
-  window.analyzejs =
-    postMessage : ->
-      console.log("arguments",  arguments)
 
-  analyzee = window.open("", "analyzee")
+  window.callGraph = new CallGraph()
+  window.tracer = new Tracer(window.callGraph, true)
+
+  # window.analyzejs =
+  #   postMessage : ->
+  #     console.log("arguments",  arguments)
+
+  window.analyzee = analyzee = window.open("", "analyzee")
+
   if analyzee.location.href == "about:blank"
     analyzee.location.href = document.location.origin
 

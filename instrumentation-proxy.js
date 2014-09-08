@@ -4,7 +4,8 @@ var http = require('http'),
     transformerProxy = require('transformer-proxy'),
     serveStatic = require('serve-static'),
     finalhandler = require('finalhandler'),
-    errorhandler = require('errorhandler');
+    errorhandler = require('errorhandler'),
+    Instrumenter = require('./dist/scripts/instrumentation/Instrumenter.js');
 
 var proxiedPort = 3000;
 var proxyPort = 8013;
@@ -13,7 +14,7 @@ var app = connect();
 var proxy = httpProxy.createProxyServer({target: 'http://localhost:' + proxiedPort});
 var transformer = transformerProxy(transformerFunction);
 var serve = serveStatic("dist");
-
+var instrumenter = new Instrumenter();
 
 app.use(errorhandler());
 
@@ -40,12 +41,15 @@ http.createServer(app).listen(proxyPort);
 console.log("The proxied server listens on",  proxiedPort);
 console.log("The proxy server listens on",  proxyPort);
 
-process.on('uncaughtException', console.log.bind(console));
+process.on('uncaughtException', function(msg) {
+  console.log("error:", msg);
+});
 
 
 
-function transformerFunction(data) {
-  return data + "\n window.opener.analyzejs.postMessage('hello');";
+function transformerFunction(data, fileName) {
+  // TODO: change transformer-proxy so that fileName will be passed
+  return instrumenter.instrument(data.toString(), fileName).toString();
 }
 
 function isNativeCode(req) {

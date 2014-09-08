@@ -7,34 +7,36 @@ window.FunctionStore =
 
   functions : {}
 
-  createFunction : (fileName, node, params) ->
 
-    id = @createID(fileName, node)
+  # createID : (fileName, node) ->
 
-    unless @functions[id]
-      @functions[id] = new JSFunction(id, fileName, node, params)
+  #   if not node.id?
+  #     node.id =
+  #       name : "anonymousFn"
+  #       range : node.range
 
-    return @functions[id]
-
-
-  createID : (fileName, node) ->
-
-    if not node.id?
-      node.id =
-        name : "anonymousFn"
-        range : node.range
-
-    fnName = node.id.name
-    # TODO: check if node.id.range === node.range
-    range = node.id.range
+  #   fnName = node.id.name
+  #   # TODO: check if node.id.range === node.range
+  #   range = node.id.range
 
 
-    [fileName, fnName, range].join("-")
+  #   [fileName, fnName, range].join("-")
 
 
-  getFunctionByID : (id) ->
+  splitID : (id) ->
+
+    [fileName, fnName, range] = id.split("-")
+    {fileName, fnName, range}
+
+
+  getOrCreateFunctionByID : (id) ->
 
     if fn = @functions[id]
       return fn
+    else
+      unencodeID = (id) ->
+        id.replace("myRidiculousLongQuoteToken", /'/g)
 
-    throw Error("Function could not be found")
+
+      { fileName, source, name, range, params } = JSON.parse(unencodeID id)
+      return @functions[id] = new JSFunction(id, fileName, source, name, params)

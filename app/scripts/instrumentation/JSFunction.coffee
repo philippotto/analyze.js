@@ -3,14 +3,13 @@
 
 class JSFunction
 
-  constructor : (@id, @fileName, @node, @params) ->
+  constructor : (@id, @fileName, @source, @name, @params) ->
 
-
-  getSourceString : -> @node.source()
+  getSourceString : -> @source
 
   getFileName : -> @fileName
 
-  getName : -> @node.id.name
+  getName : -> @name
 
   getParameters : -> @params
 
@@ -19,5 +18,3 @@ class JSFunction
     _.any([@getName(), @getFileName()], (property) ->
       property.toLowerCase().indexOf(query.toLowerCase()) > -1
     )
-
-JSFunction

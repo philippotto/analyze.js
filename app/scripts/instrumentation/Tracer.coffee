@@ -12,7 +12,7 @@ class Tracer
 
   traceEnter : (id, params, context) ->
 
-    jsFunction = FunctionStore.getFunctionByID(id)
+    jsFunction = FunctionStore.getOrCreateFunctionByID(id)
     invocationNode = new InvocationNode(jsFunction, params, context)
 
     @callGraph.pushInvocation invocationNode
