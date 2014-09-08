@@ -11,7 +11,7 @@ class Router extends UberRouter
   navbarSelector : "#navbar"
 
   routes :
-    "" : "home"
+    "analyzejs/index.html" : "home"
 
   whitelist : []
 
