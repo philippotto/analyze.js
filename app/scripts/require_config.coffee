@@ -12,7 +12,6 @@ require.config(
     esprima : "../bower_components/esprima/esprima"
     react : "../bower_components/react/react-with-addons"
     "react-bootstrap" : "../bower_components/react-bootstrap/react-bootstrap"
-    # foundation : "../bower_components/foundation/js/foundation"
 
   map :
     backbone :

@@ -45,7 +45,7 @@ process.on('uncaughtException', console.log.bind(console));
 
 
 function transformerFunction(data) {
-  return data + "\n // an additional line at the end of every file";
+  return data + "\n window.opener.analyzejs.postMessage('hello');";
 }
 
 function isNativeCode(req) {

@@ -2,18 +2,8 @@
 react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
+./Formatter : Formatter
 ###
-
-Formatter =
-  formatValue : (value) ->
-
-    switch typeof value
-      when "string" then "\"#{value}\""
-      when "function" then "function"
-      when "object" then "object"
-      when "number" then value
-      else value
-
 
 ObjectViewer = React.createClass
 
@@ -48,8 +38,3 @@ ObjectViewer = React.createClass
     ul {style},
       children
 
-
-# find a better way to expose the Formatter
-ObjectViewer.Formatter = Formatter
-
-ObjectViewer

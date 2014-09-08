@@ -4,216 +4,14 @@ react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
 object_viewer : ObjectViewer
+instrumentation/FunctionStore : FunctionStore
+instrumentation/JSFunction : JSFunction
+instrumentation/InvocationNode : InvocationNode
+instrumentation/CallGraph : CallGraph
+instrumentation/Tracer : Tracer
 ###
 
 ->
-
-  window.FunctionStore =
-
-    functions : {}
-
-    createFunction : (fileName, node, params) ->
-
-      id = @createID(fileName, node)
-
-      unless @functions[id]
-        @functions[id] = new JSFunction(id, fileName, node, params)
-
-      return @functions[id]
-
-
-    createID : (fileName, node) ->
-
-      if not node.id?
-        node.id =
-          name : "anonymousFn"
-          range : node.range
-
-      fnName = node.id.name
-      # TODO: check if node.id.range === node.range
-      range = node.id.range
-
-
-      [fileName, fnName, range].join("-")
-
-
-    getFunctionByID : (id) ->
-
-      if fn = @functions[id]
-        return fn
-
-      throw Error("Function could not be found")
-
-
-
-  class JSFunction
-
-    constructor : (@id, @fileName, @node, @params) ->
-
-
-    getSourceString : -> @node.source()
-
-    getFileName : -> @fileName
-
-    getName : -> @node.id.name
-
-    getParameters : -> @params
-
-    matches : (query) ->
-
-      _.any([@getName(), @getFileName()], (property) ->
-        property.toLowerCase().indexOf(query.toLowerCase()) > -1
-      )
-
-
-
-  class InvocationNode
-
-    constructor : (@jsFunction, params, @context) ->
-      if params
-        @params = [].slice.call(params)
-      else
-        @params = []
-      @children = []
-      @startTime = performance.now()
-      @changedDOM = false
-
-    addChild : (child) ->
-      @children.push child
-
-    stopInvocation : (@returnValue, @thrownException) ->
-      @endTime = performance.now()
-
-    changesDOM : (bool) ->
-      if arguments.length == 0
-        return @changedDOM
-      else
-        @changedDOM = bool
-
-    getTotalTime : ->
-      @endTime - @startTime
-
-    getPureTime : ->
-
-      @getTotalTime() - _.invoke(@children, "getTotalTime").reduce(
-        (sum, num) -> sum + num,
-        0
-      )
-
-    getArguments : ->
-      @params
-
-    getContext : ->
-      @context
-
-    getViewableArguments : ->
-
-      # Returns an array where each element is an object in the form of:
-      # parameter : argument
-      # The parameter is a string which is derived by the function parameter list.
-      # The argument is the passed variable.
-      # Mind that you can provide fewer/more arguments than parameters to a function.
-
-      i = -1
-      params = @jsFunction.getParameters()
-      args = @getArguments()
-      viewableArguments = []
-
-      while ++i < params.length
-        el = {}
-        el[params[i]] = args[i]
-
-        viewableArguments.push el
-
-      i--
-
-      while ++i < args.length
-        el = {}
-        el["not listed"] = args[i]
-        el
-
-        viewableArguments.push el
-
-      viewableArguments
-
-    getFormattedArguments : ->
-
-      # TODO: use an object viewer and better abbreviations
-
-      paramsAsStringArray = @params.map ObjectViewer.Formatter.formatValue
-
-      "[#{paramsAsStringArray}]"
-
-    getReturnValue : ->
-
-      @returnValue
-
-    getFormattedReturnValue : ->
-
-      ObjectViewer.Formatter.formatValue @returnValue
-
-    matches : (query) ->
-
-      return @jsFunction.matches(query)
-
-    hasChildren : ->
-
-      @children.length
-
-
-  class CallGraph
-
-    constructor : ->
-      @invocationIDCounter = 0
-      @root = new InvocationNode()
-      @root.isRoot = true
-      @activeNode = @root
-
-    resetToRoot : ->
-
-      @activeNode = @root
-
-    pushInvocation : (invocationNode) ->
-
-      # TODO: find a better place for the id
-      invocationNode.id = @invocationIDCounter++
-      @activeNode.addChild(invocationNode)
-      invocationNode.parentInvocation = @activeNode
-      @activeNode = invocationNode
-
-    popInvocation : (returnValue, thrownException) ->
-
-      @activeNode.stopInvocation(returnValue, thrownException)
-      @activeNode = @activeNode.parentInvocation
-
-    registerDOMModification : =>
-
-      @activeNode?.changesDOM(true)
-
-
-  class Tracer
-
-    constructor : (@callGraph, listenToDOMModifications) ->
-
-      if listenToDOMModifications
-        document.addEventListener("DOMSubtreeModified", @callGraph.registerDOMModification, false);
-
-
-    traceEnter : (id, params, context) ->
-
-      jsFunction = FunctionStore.getFunctionByID(id)
-      invocationNode = new InvocationNode(jsFunction, params, context)
-
-      @callGraph.pushInvocation invocationNode
-
-
-    traceExit : (id, returnValue, thrownException) ->
-      if id != @callGraph.activeNode.jsFunction.id
-        # TODO: integrate assertion library
-        console.error("traceExit was called for a different function than traceEnter")
-
-      @callGraph.popInvocation(returnValue, thrownException)
-
 
   window.callGraph = new CallGraph()
   window.tracer = new Tracer(window.callGraph, true)
@@ -526,3 +324,14 @@ object_viewer : ObjectViewer
       App {callHistoryData}
       DOMroot
     )
+
+
+  window.analyzejs =
+    postMessage : ->
+      console.log("arguments",  arguments)
+
+  analyzee = window.open("", "analyzee")
+  if analyzee.location.href == "about:blank"
+    analyzee.location.href = document.location.origin
+
+  analyzee.focus()
