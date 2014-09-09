@@ -34,9 +34,6 @@ window.FunctionStore =
     if fn = @functions[id]
       return fn
     else
-      unencodeID = (id) ->
-        id.replace("myRidiculousLongQuoteToken", /'/g)
 
-
-      { fileName, source, name, range, params } = JSON.parse(unencodeID id)
+      { fileName, source, name, range, params } = id
       return @functions[id] = new JSFunction(id, fileName, source, name, params)

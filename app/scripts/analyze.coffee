@@ -282,12 +282,17 @@ instrumentation/Tracer : Tracer
           fileName : "object.js"
           testString : "someObj.fn();"
 
-    callHistoryData = generateCallHistoryData(getTestCase())
 
-    DOMroot = document.getElementById('main')
-    React.renderComponent(
-      App {callHistoryData}
-      DOMroot
+    setTimeout(
+      =>
+        callHistoryData = generateCallHistoryData(getTestCase())
+
+        DOMroot = document.getElementById('main')
+        React.renderComponent(
+          App {callHistoryData}
+          DOMroot
+        )
+      5000
     )
 
 
