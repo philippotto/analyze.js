@@ -1,5 +1,6 @@
 ### define
 ./InvocationNode : InvocationNode
+./FunctionStore : FunctionStore
 ###
 
 class Tracer

@@ -2,6 +2,7 @@
 ./JSFunction : JSFunction
 ###
 
+# TODO: change to non-global
 
 window.FunctionStore =
 
