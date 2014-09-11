@@ -12,12 +12,10 @@ class Instrumenter
       # first two parts of condition could be enough?
       if parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
         paramsAsStringArray = _.invoke(node.parent.params, "source")
-        fnID = @createID(fileName, parent, paramsAsStringArray)
-
-
+        [fnID, fnProperties] = @generateMetaInfo(fileName, parent, paramsAsStringArray)
 
         newCode =   """{
-                    window.opener.tracer.traceEnter(#{fnID}, arguments, this);
+                    window.opener.app.tracer.traceEnter("#{fnID}", #{fnProperties}, arguments, this);
                     var thrownException = null;
                     try {
                       var returnValue = (function(#{paramsAsStringArray.join(", ")}) {
@@ -26,7 +24,7 @@ class Instrumenter
                     } catch(ex) {
                       thrownException = ex;
                     }
-                    window.opener.tracer.traceExit(#{fnID}, returnValue, thrownException);
+                    window.opener.app.tracer.traceExit("#{fnID}", returnValue, thrownException);
                     if(thrownException)
                       throw thrownException;
                     return returnValue;
@@ -42,7 +40,7 @@ class Instrumenter
     )
 
 
-  createID : (fileName, node, params) ->
+  generateMetaInfo : (fileName, node, params) ->
 
     ###
     has to contain:
@@ -51,7 +49,7 @@ class Instrumenter
       + name
       (+ range)
       - params
-   ###
+    ###
 
     source = node.source()
 
@@ -65,9 +63,10 @@ class Instrumenter
     # TODO: check if node.id.range === node.range
     range = node.id.range
 
-    complexID = { fileName, source, name, range, params }
+    fnID = [fileName, name, range].join("-")
+    fnProperties = JSON.stringify { fileName, source, name, range, params }
 
-    JSON.stringify(complexID)
+    [fnID, fnProperties]
 
 
 module.exports = Instrumenter
