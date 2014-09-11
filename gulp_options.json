@@ -1,7 +1,7 @@
 {
   "src": {
     "dir": "app",
-    "html": "app/index.html",
+    "html": "app/**/*.html",
     "scripts": "app/scripts/**/*.{js,coffee}",
     "styles": "app/styles/index.less",
     "images": "app/images/**/*.{jpg,png,gif}"
