@@ -3,7 +3,7 @@ _ = require("lodash")
 
 class Instrumenter
 
-  instrument : (codeString, fileName) ->
+  instrument : (codeString, fileURL) ->
 
     falafel(codeString, (node) =>
 
@@ -12,7 +12,7 @@ class Instrumenter
       # first two parts of condition could be enough?
       if parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
         paramsAsStringArray = _.invoke(node.parent.params, "source")
-        [fnID, fnProperties] = @generateMetaInfo(fileName, parent, paramsAsStringArray)
+        [fnID, fnProperties] = @generateMetaInfo(fileURL, parent, paramsAsStringArray)
 
         newCode =   """{
                     window.opener.app.tracer.traceEnter("#{fnID}", #{fnProperties}, arguments, this);
@@ -40,19 +40,9 @@ class Instrumenter
     )
 
 
-  generateMetaInfo : (fileName, node, params) ->
-
-    ###
-    has to contain:
-      + fileName
-      + source
-      + name
-      (+ range)
-      - params
-    ###
+  generateMetaInfo : (fileURL, node, params) ->
 
     source = node.source()
-
 
     if not node.id?
       node.id =
@@ -63,8 +53,8 @@ class Instrumenter
     # TODO: check if node.id.range === node.range
     range = node.id.range
 
-    fnID = [fileName, name, range].join("-")
-    fnProperties = JSON.stringify { fileName, source, name, range, params }
+    fnID = [fileURL, name, range].join("-")
+    fnProperties = JSON.stringify { fileURL, source, name, range, params }
 
     [fnID, fnProperties]
 

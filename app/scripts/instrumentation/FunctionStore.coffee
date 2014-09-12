@@ -10,8 +10,8 @@ window.FunctionStore =
 
   splitID : (id) ->
 
-    [fileName, fnName, range] = id.split("-")
-    {fileName, fnName, range}
+    [fileURL, fnName, range] = id.split("-")
+    {fileURL, fnName, range}
 
 
   getOrCreateFunctionByID : (id, fnProperties) ->
@@ -21,5 +21,5 @@ window.FunctionStore =
 
     else
 
-      { fileName, source, name, range, params } = fnProperties
-      return @functions[id] = new JSFunction(id, fileName, source, name, params)
+      { fileURL, source, name, range, params } = fnProperties
+      return @functions[id] = new JSFunction(id, fileURL, source, name, params)

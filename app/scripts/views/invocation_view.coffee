@@ -3,7 +3,7 @@ react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
 object_viewer : ObjectViewer
-
+../Formatter : Formatter
 ###
 
 R = withReact.R
@@ -26,7 +26,7 @@ Invocation = React.createClass
     div className : "invocation", style : @getStyle(), onDoubleClick : @props.toggleCollapsing,
       div className : "pull-right",
         div onClick : @logInvocation,
-          jsFunction.getFileName()
+          Formatter.extractNameFromFileURL(jsFunction.getFileURL())
           @getTimeMarker(invocation)
       div {},
         @getToggler()

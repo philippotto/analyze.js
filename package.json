@@ -34,7 +34,7 @@
     "colors": "^0.6.2",
     "http": "0.0.0",
     "connect": "^2.25.7",
-    "transformer-proxy": "^0.1.0",
+    "transformer-proxy": "*",
     "supervisor": "^0.6.0"
   },
   "scripts": {

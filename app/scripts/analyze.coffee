@@ -16,7 +16,7 @@ views/app_view : AppView
     switch testcase
       when "immutable"
         string : immutableCode
-        fileName : "immutable.js"
+        fileURL : "immutable.js"
         testString : "map = Immutable.Map({a : 1, b : 2, c : 3}); map.set('d', 4)"
 
       when "simpleCallHierarchy"
@@ -38,19 +38,19 @@ views/app_view : AppView
             return "c" + a(arg1, "c is calling");
           }
           """
-        fileName : "testFile.js"
+        fileURL : "testFile.js"
         testString : "a('anArg'); a('anArg', 'anArg');"
 
       when "parameterCheck"
         string : """
           function fn(p1, p2, p3) {}
         """
-        fileName : "parameterCheck.js"
+        fileURL : "parameterCheck.js"
         testString : "fn('aString for p1', { obj : 'for p2'})"
 
       when "function expression"
         string : "var someObj = { fn : function() { console.log('someObj was invoked')} }"
-        fileName : "object.js"
+        fileURL : "object.js"
         testString : "someObj.fn();"
 
 

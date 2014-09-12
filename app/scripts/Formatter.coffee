@@ -10,3 +10,8 @@ Formatter =
       when "object" then "object"
       when "number" then value
       else value
+
+  extractNameFromFileURL : (fileURL) ->
+
+    reg = /\/?([^\/]*)\/?$/
+    reg.exec(fileURL)[1]

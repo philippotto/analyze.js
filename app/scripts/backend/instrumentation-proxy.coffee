@@ -8,9 +8,8 @@ errorhandler = require("errorhandler")
 Instrumenter = require("../instrumentation/Instrumenter.js")
 
 
-transformerFunction = (data, fileName) ->
-  # TODO: change transformer-proxy so that fileName will be passed
-  instrumenter.instrument(data.toString(), fileName).toString()
+transformerFunction = (data, req) ->
+  instrumenter.instrument(data.toString(), req.url).toString()
 
 
 isNativeCode = (req) ->
