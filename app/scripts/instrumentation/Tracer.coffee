@@ -29,7 +29,6 @@ class Tracer
 
     app.execute("renderCallGraph")
 
-
   getRoot : ->
 
     @callGraph.root

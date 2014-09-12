@@ -67,7 +67,7 @@ views/app_view : AppView
 
   app.commands.setHandler(
     "renderCallGraph"
-    _.throttle(
+    _.debounce(
       =>
         callHistoryData = app.tracer.getRoot()
 
@@ -75,6 +75,7 @@ views/app_view : AppView
           AppView {callHistoryData}
           document.getElementById("main")
         )
-      1000
+      500
+      leading : true
     )
   )

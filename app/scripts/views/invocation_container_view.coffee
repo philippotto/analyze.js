@@ -11,7 +11,8 @@ PureRenderMixin = React.addons.PureRenderMixin
 
 InvocationContainerView = React.createClass
 
-  mixins: [PureRenderMixin]
+  # doesn't work for live rendering since the CallGraph is not pure
+  # mixins: [PureRenderMixin]
 
   getInitialState : ->
 
