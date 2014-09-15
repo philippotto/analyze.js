@@ -33,7 +33,7 @@ describe("Instrumenter", ->
     fileURL = "aFileURL"
     instrumentedCode = instrumenter.instrument(fnCode, fileURL)
 
-    [window, called, protocol] = getBasicTracer(called, protocol)
+    [window, called, protocol] = getBasicTracer()
 
     try
       eval(instrumentedCode)
@@ -65,7 +65,7 @@ describe("Instrumenter", ->
     startCode = "aThrowingFunction()"
 
     instrumentedCode = instrumenter.instrument(fnCode, "")
-    [window, called, protocol] = getBasicTracer(called, protocol)
+    [window, called, protocol] = getBasicTracer()
 
 
     bubbledException = null
@@ -81,6 +81,32 @@ describe("Instrumenter", ->
     expect(protocol.exit.thrownExeption).toNotEqual(null)
     expect(protocol.exit.thrownExeption).toEqual(bubbledException)
 
+  )
+
+  it("can handle different function naming conventions", ->
+
+    fnCode = """
+    function a() {};
+    var b = function() {};
+    var obj = {
+      c : function() {}
+    }
+    """
+
+    instrumentedCode = instrumenter.instrument(fnCode, "")
+
+    eval(instrumentedCode)
+    [window, called, protocol] = getBasicTracer()
+
+
+    eval("a()")
+    expect(protocol.enter.props.name).toBe("a")
+
+    eval("b()")
+    expect(protocol.enter.props.name).toBe("b")
+
+    eval("obj.c()")
+    expect(protocol.enter.props.name).toBe("c")
   )
 
 )

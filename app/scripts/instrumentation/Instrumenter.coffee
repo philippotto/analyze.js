@@ -45,8 +45,16 @@ class Instrumenter
     source = node.source()
 
     if not node.id?
+      alternateName = switch node.parent.type
+        when "VariableDeclarator"
+           node.parent.id.name
+        when "Property"
+          node.parent.key.name
+        else
+          "anonymousFn"
+
       node.id =
-        name : "anonymousFn"
+        name : alternateName
         range : node.range
 
     name = node.id.name
