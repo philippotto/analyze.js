@@ -39,8 +39,9 @@
   },
   "scripts": {
     "postinstall": "bower install && gulp",
-    "test" : "jasmine-node dist/scripts/backend-spec"
-    // "test": "node_modules/.bin/karma start --single-run --browsers PhantomJS",
+    "test" : "jasmine-node dist/scripts/backend-spec",
+    "atest" : "jasmine-node --autotest dist/scripts/backend-spec",
+    "ktest": "node_modules/.bin/karma start --single-run --browsers PhantomJS"
   },
   "devDependencies": {
     "gulp": "^3.8.7",
