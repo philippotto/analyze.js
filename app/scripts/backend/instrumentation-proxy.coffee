@@ -9,7 +9,7 @@ Instrumenter = require("../instrumentation/Instrumenter.js")
 
 
 transformerFunction = (data, req) ->
-  instrumenter.instrument(data.toString(), req.url).toString()
+  instrumenter.instrument(data.toString(), req.url)
 
 
 isNativeCode = (req) ->

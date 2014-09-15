@@ -37,7 +37,7 @@ class Instrumenter
         catch error
           if error.message != "syntax_valid"
             console.error("invalid code!!!", newCode)
-    )
+    ).toString()
 
 
   generateMetaInfo : (fileURL, node, params) ->

@@ -1,6 +1,5 @@
 ### define
 ../instrumentation/Instrumenter : Instrumenter
-
 ###
 
 describe("Instrumenter", ->
