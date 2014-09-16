@@ -91,6 +91,13 @@ describe("Instrumenter", ->
     var obj = {
       c : function() {}
     }
+    var caller = function(cb) { cb(); };
+    var callNamed = function() {
+      caller(function namedFunction() {});
+    };
+    var callAnonymous = function() {
+      caller(function() {});
+    };
     """
 
     instrumentedCode = instrumenter.instrument(fnCode, "")
@@ -107,6 +114,18 @@ describe("Instrumenter", ->
 
     eval("obj.c()")
     expect(protocol.enter.props.name).toBe("c")
+
+    eval("callNamed()")
+    expect(protocol.enter.props.name).toBe("namedFunction")
+
+    # TODO:
+    # It would probably be nice to get the name "cb". But this would require
+    # instrumenting every function call. For now anonymousFn should be enough.
+
+    eval("callAnonymous()")
+    expect(protocol.enter.props.name).toBe("anonymousFn")
+
+
   )
 
 )
