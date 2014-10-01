@@ -47,7 +47,8 @@ class InvocationNode
     # parameter : argument
     # The parameter is a string which is derived by the function parameter list.
     # The argument is the passed variable.
-    # Mind that you can provide fewer/more arguments than parameters to a function.
+    # Mind that you can provide fewer/more arguments than parameters to a
+    # function.
 
     i = -1
     params = @jsFunction.getParameters()
@@ -65,7 +66,6 @@ class InvocationNode
     while ++i < args.length
       el = {}
       el["not listed"] = args[i]
-      el
 
       viewableArguments.push el
 

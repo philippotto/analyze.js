@@ -10,33 +10,36 @@ class Instrumenter
       parent = node.parent
 
       # first two parts of condition could be enough?
-      if parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
-        paramsAsStringArray = _.invoke(node.parent.params, "source")
-        [fnID, fnProperties] = @generateMetaInfo(fileURL, parent, paramsAsStringArray)
+      unless parent?.type in ["FunctionDeclaration", "FunctionExpression"]# and node.type is "BlockStatement"
+        return
 
-        newCode =   """{
-                    window.opener.app.tracer.traceEnter("#{fnID}", #{fnProperties}, arguments, this);
-                    var thrownException = null;
-                    try {
-                      var returnValue = (function(#{paramsAsStringArray.join(", ")}) {
-                        #{node.source()};
-                      }).apply(this, arguments);
-                    } catch(ex) {
-                      thrownException = ex;
-                    }
-                    window.opener.app.tracer.traceExit("#{fnID}", returnValue, thrownException);
-                    if(thrownException)
-                      throw thrownException;
-                    return returnValue;
-                    }"""
+      paramsAsStringArray = _.invoke(node.parent.params, "source")
+      [fnID, fnProperties] = @generateMetaInfo(fileURL, parent, paramsAsStringArray)
 
-        node.update newCode
+      newCode =
+        """{
+        window.opener.app.tracer.traceEnter("#{fnID}", #{fnProperties}, arguments, this);
+        var thrownException = null;
+        try {
+          var returnValue = (function(#{paramsAsStringArray.join(", ")}) {
+            #{node.source()};
+          }).apply(this, arguments);
+        } catch(ex) {
+          thrownException = ex;
+        }
+        window.opener.app.tracer.traceExit("#{fnID}", returnValue, thrownException);
+        if(thrownException)
+          throw thrownException;
+        return returnValue;
+        }"""
 
-        try
-          eval("throw Error('syntax_valid'); " + newCode)
-        catch error
-          if error.message != "syntax_valid"
-            console.error("invalid code!!!", newCode)
+      node.update(newCode)
+
+      try
+        eval("throw Error('syntax_valid'); " + newCode)
+      catch error
+        if error.message != "syntax_valid"
+          console.error("invalid code!!!", newCode)
     ).toString()
 
 
@@ -47,7 +50,7 @@ class Instrumenter
     if not node.id?
       alternateName = switch node.parent.type
         when "VariableDeclarator"
-           node.parent.id.name
+          node.parent.id.name
         when "Property"
           node.parent.key.name
         else
