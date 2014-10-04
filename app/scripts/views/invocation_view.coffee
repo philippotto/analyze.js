@@ -45,9 +45,9 @@ Invocation = React.createClass
           span className : "return-arrow",
             " → "
           new VariableView(data : invocation.getReturnValue())
-        em {onClick : -> console.log(invocation.getContext())},
-            " context"
-        span {},
+        Label {className : "offsetted-label", bsStyle: "default", onClick : -> console.log(invocation.getContext())},
+          "context"
+        span {className: "offsetted-label"},
           if invocation.changesDOM() then Label bsStyle: "warning", "Changes DOM"
 
 
