@@ -4,14 +4,15 @@ react-bootstrap : ReactBootstrap
 with_react : withReact
 object_viewer : ObjectViewer
 ../Formatter : Formatter
+./variable_view : VariableView
 ###
 
 R = withReact.R
+eval(withReact.import)
 
 Invocation = React.createClass
 
   render : ->
-    eval(withReact.import)
 
     invocation = @props.invocation
     jsFunction = invocation.jsFunction
@@ -19,14 +20,16 @@ Invocation = React.createClass
     if invocation.isRoot
       return div {}
 
-    popoverOverlay = R.Popover {title: "Arguments"},
+    popoverOverlay = Popover {title: "Arguments"},
       ObjectViewer { object : invocation.getViewableArguments() }
 
+    formattedArguments = @getFormattedArguments(invocation)
 
     div className : "invocation", style : @getStyle(), onDoubleClick : @props.toggleCollapsing,
       div className : "pull-right",
         div onClick : @logInvocation,
-          Formatter.extractNameFromFileURL(jsFunction.getFileURL())
+          span className : "file-name",
+            Formatter.extractNameFromFileURL(jsFunction.getFileURL())
           @getTimeMarker(invocation)
       div {},
         @getToggler()
@@ -35,19 +38,36 @@ Invocation = React.createClass
         span {},
           OverlayTrigger {trigger: "click", placement: "right", overlay : popoverOverlay},
             span {},
-              "(#{invocation.getFormattedArguments()})"
+              "("
+              formattedArguments
+              ")"
         span {onClick : -> console.log(invocation.getReturnValue())},
-            " → " + invocation.getFormattedReturnValue()
+          span className : "return-arrow",
+            " → "
+          new VariableView(data : invocation.getReturnValue())
         em {onClick : -> console.log(invocation.getContext())},
             " context"
         span {},
           if invocation.changesDOM() then Label bsStyle: "warning", "Changes DOM"
 
 
+  getFormattedArguments : (invocation) ->
+
+    invocation.getArguments().map((arg) ->
+      new VariableView(data : arg)
+    ).reduce(
+      (acc, el, index, array) ->
+        acc.push(el)
+        if index < array.length - 1
+          acc.push(span {}, ", ")
+        acc
+      []
+    )
+
+
   formatTime : (t) -> t.toFixed(2) + " ms"
 
   getTimeMarker: (invocation) ->
-    eval(withReact.import)
 
     timeTooltip = Tooltip {},
       div {}, "Total time: " + @formatTime invocation.getTotalTime()
@@ -60,7 +80,7 @@ Invocation = React.createClass
   getToggler: ->
 
     if @props.invocation.hasChildren()
-      R.div {
+      div {
         className: "triangle " + if @props.collapsed then "closed" else "open"
         ref : "collapseToggler"
         onClick : @props.toggleCollapsing

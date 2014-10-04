@@ -4,6 +4,19 @@
 // @import (less) "bower_components/foundation/css/normalize.css";
 @import "bower_components/font-awesome/less/font-awesome.less";
 
+
+@monokai-yellow: #E6DB74; // string
+@monokai-purple: #AE81FF; // number
+@monokai-white: #F8F8F2; // variable
+@monokai-pink: #F92672; // keyword
+@monokai-blue: #66D9EF; // library element
+@monokai-green: #A6E22E; // class or function name
+@monokai-orange: #FD971F; // function argument
+@monokai-gray: #272822; // background
+@monokai-dark-gray: #49483E; // highlight
+@monokai-light-gray: #75715E; // comment
+
+
 h1 {
   font-size: 50*2px;
 }
@@ -22,6 +35,28 @@ h1 {
 
 .function-name {
   font-weight: bold;
+  color: @monokai-green;
+}
+
+.arg-string {
+  color: @monokai-yellow;
+}
+
+.arg-function {
+  color: @monokai-green;
+}
+
+.arg-object {
+  color: @monokai-white;
+  font-style: italic;
+}
+
+.arg-number {
+  color: @monokai-purple;
+}
+
+.arg-other {
+  color: @monokai-pink;
 }
 
 .invocation-container {
@@ -33,7 +68,7 @@ h1 {
 }
 
 .invocation:hover {
-  background: rgb(239, 247, 255);
+  background: @monokai-dark-gray;
   border-color: #D5EDFF;
 }
 
@@ -46,11 +81,11 @@ h1 {
 }
 
 .slow {
-  background-color: @brand-warning;
+  background-color: @monokai-orange;
 }
 
 .fast {
-  background-color: @brand-success;
+  background-color: @monokai-green;
 }
 
 .triangle {
@@ -71,6 +106,26 @@ h1 {
   border-width: 8.7px 5px 0 5px;
   border-color: #6b6b6b transparent transparent transparent;
 }
+
+
+body {
+  background-color: @monokai-gray;
+  color: @monokai-white;
+}
+
+
+.label-warning {
+  background-color: @monokai-orange;
+}
+
+.file-name {
+  color: @monokai-light-gray;
+}
+
+.return-arrow {
+  color: @monokai-blue;
+}
+
 
 /* Base styles (regardless of theme) */
 .bs-callout {

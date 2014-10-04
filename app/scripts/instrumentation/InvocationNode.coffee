@@ -71,25 +71,16 @@ class InvocationNode
 
     viewableArguments
 
-  getFormattedArguments : ->
-
-    # TODO: use an object viewer and better abbreviations
-
-    paramsAsStringArray = @params.map Formatter.formatValue
-
-    "[#{paramsAsStringArray}]"
 
   getReturnValue : ->
 
     @returnValue
 
-  getFormattedReturnValue : ->
-
-    Formatter.formatValue @returnValue
 
   matches : (query) ->
 
     return @jsFunction.matches(query)
+
 
   hasChildren : ->
 

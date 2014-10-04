@@ -18,3 +18,6 @@ function c(arg1) {
 
 a('anArg');
 a('anArg', 'anArg');
+a("number", 1234)
+a("object", {})
+a("function", function() {})
