@@ -46,9 +46,16 @@ h1 {
   color: @monokai-green;
 }
 
-.arg-object {
-  color: @monokai-white;
+.arg-object, .arg-array {
   font-style: italic;
+}
+
+.arg-object {
+  color: @monokai-blue;
+}
+
+.arg-array {
+  color: @monokai-pink;
 }
 
 .arg-number {
@@ -65,6 +72,7 @@ h1 {
 
 .invocation {
   margin-bottom: 10px;
+  padding: 1px;
 }
 
 .invocation:hover {

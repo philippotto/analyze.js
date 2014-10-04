@@ -21,3 +21,4 @@ a('anArg', 'anArg');
 a("number", 1234)
 a("object", {})
 a("function", function() {})
+a("array", ["str", 1324])

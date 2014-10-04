@@ -15,21 +15,22 @@ VariableView = React.createClass
     eval(withReact.import)
     value = @props.data
 
-
-    switch typeof value
-      when "string"
-        span className : "arg-string",
-          "\"#{value}\""
-      when "function"
-        span className : "arg-function",
-          "function"
-      when "object"
-        span className : "arg-object",
-          "object"
-      when "number"
-        span className : "arg-number",
-          value
-      else
-        span className : "arg-other",
-          value
+    if _.isString(value)
+      span className : "arg-string",
+        "\"#{value}\""
+    else if _.isFunction(value)
+      span className : "arg-function",
+        "Function"
+    else if _.isArray(value)
+      span className : "arg-array",
+        "Array"
+    else if _.isObject(value)
+      span className : "arg-object",
+        "Object"
+    else if _.isNumber(value)
+      span className : "arg-number",
+        value
+    else
+      span className : "arg-other",
+        "Unknown Variable"
 
