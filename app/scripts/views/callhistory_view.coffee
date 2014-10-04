@@ -8,6 +8,7 @@ object_viewer : ObjectViewer
 ###
 
 R = withReact.R
+classSet = React.addons.classSet
 
 CallHistoryView = React.createClass
 
@@ -20,13 +21,17 @@ CallHistoryView = React.createClass
 
   render : ->
 
-    additionalClass = if @props.narrowCallHistory then "callhistory-narrow" else ""
+    className = classSet(
+      "call-history" : true
+      "callhistory-narrow" : @props.narrowCallHistory
+    )
 
-    R.div {className : "call-history " + additionalClass},
+    R.div {className},
       InvocationContainerView {
         invocation : @props.callHistoryData
         searchQuery : @props.searchQuery
         collapsed : false
-        hidden : false
+        hidden : false,
+        setCurrentFunction : @props.setCurrentFunction
       }
 

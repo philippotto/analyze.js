@@ -22,7 +22,8 @@
     "syphon": "scalableminds/syphon#~0.4.1",
     "falafel": "substack/node-falafel",
     "font-awesome": "~4.1.0",
-    "marionette": "~2.0.3"
+    "marionette": "~2.0.3",
+    "highlightjs": "~8.0.0"
   },
   "resolutions": {
     "jquery": "~2.1.1"

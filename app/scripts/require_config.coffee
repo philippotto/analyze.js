@@ -12,6 +12,7 @@ require.config(
     esprima : "../bower_components/esprima/esprima"
     react : "../bower_components/react/react-with-addons"
     "react-bootstrap" : "../bower_components/react-bootstrap/react-bootstrap"
+    hljs : "../bower_components/highlightjs/highlight.pack"
 
   map :
     backbone :
@@ -32,5 +33,7 @@ require.config(
     "falafel" :
       deps: ["esprima"]
       exports: "module.exports"
+    "hljs" :
+      exports: "hljs"
 
 )

@@ -25,7 +25,9 @@ Invocation = React.createClass
 
     formattedArguments = @getFormattedArguments(invocation)
 
-    div className : "invocation", style : @getStyle(), onDoubleClick : @props.toggleCollapsing,
+    onDoubleClick = => @props.setCurrentFunction(jsFunction)
+
+    div {className : "invocation", style : @getStyle(), onDoubleClick},
       div className : "pull-right",
         div onClick : @logInvocation,
           span className : "file-name",

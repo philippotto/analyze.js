@@ -27,6 +27,7 @@ InvocationContainerView = React.createClass
         searchQuery : @props.searchQuery
         hidden : @props.hidden or @state.collapsed
         key : "invocation-container-" + invocation.id
+        setCurrentFunction : @props.setCurrentFunction
       }
 
     R.div {className : "invocation-container"},
@@ -36,6 +37,7 @@ InvocationContainerView = React.createClass
         collapsed : @state.collapsed
         hidden : @props.hidden
         toggleCollapsing : @collapse
+        setCurrentFunction : @props.setCurrentFunction
       )
       invocationNodes
 

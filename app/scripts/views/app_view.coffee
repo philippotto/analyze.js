@@ -5,6 +5,7 @@ with_react : withReact
 object_viewer : ObjectViewer
 ./navigation_view : NavigationView
 ./callhistory_view : CallHistoryView
+./code_view : CodeView
 ###
 
 R = withReact.R
@@ -15,7 +16,7 @@ App = React.createClass
 
     searchQuery : ""
     narrowCallHistory : false
-
+    currentFunction : null
 
   handleSearch : (searchQuery) ->
 
@@ -24,11 +25,21 @@ App = React.createClass
 
   toggleNarrowCallHistory : ->
 
-    # TODO: immutable.js ?
-    @state.narrowCallHistory = !@state.narrowCallHistory
-    @setState @state
+    @setState(React.addons.update(@state,
+      narrowCallHistory :
+        $apply : (b) -> !b
+    ))
+
 
   render : ->
+
+    setCurrentFunction = (jsFunction) =>
+
+      @setState(React.addons.update(@state, {
+        currentFunction :
+          $set : jsFunction
+      }))
+
 
     R.div {},
       NavigationView { onSearch : @handleSearch, searchQuery : @state.searchQuery }
@@ -36,6 +47,9 @@ App = React.createClass
         CallHistoryView {
           searchQuery : @state.searchQuery
           callHistoryData : @props.callHistoryData
-          narrowCallHistory : @state.narrowCallHistory
+          narrowCallHistory : @state.narrowCallHistory,
+          setCurrentFunction
         }
+      new CodeView({data : @state.currentFunction})
+
 
