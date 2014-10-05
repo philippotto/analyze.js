@@ -13,7 +13,7 @@ class Instrumenter
         return
 
       paramsAsStringArray = _.invoke(node.parent.params, "source")
-      [fnID, fnProperties] = @generateMetaInfo(fileURL, parent, paramsAsStringArray)
+      [fnID, fnProperties] = @generateMetaInfo(codeString, fileURL, parent, paramsAsStringArray)
 
       newCode =
         """{
@@ -43,9 +43,10 @@ class Instrumenter
     ).toString()
 
 
-  generateMetaInfo : (fileURL, node, params) ->
+  generateMetaInfo : (codeString, fileURL, node, params) ->
 
-    source = node.source()
+    # don't use node.source() to avoid saving the instrumented source
+    source = "".slice.apply(codeString, node.range)
 
     if not node.id?
       alternateName = switch node.parent.type
@@ -58,11 +59,9 @@ class Instrumenter
 
       node.id =
         name : alternateName
-        range : node.range
 
     name = node.id.name
-    # TODO: check if node.id.range === node.range
-    range = node.id.range
+    range = node.range
 
     fnID = [fileURL, name, range].join("-")
     fnProperties = JSON.stringify { fileURL, source, name, range, params }

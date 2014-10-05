@@ -75,7 +75,7 @@ Invocation = React.createClass
       div {}, "Total time: " + @formatTime invocation.getTotalTime()
       div {}, "Pure time: " + @formatTime invocation.getPureTime()
 
-    OverlayTrigger {trigger: "hover", placement: "right", overlay : timeTooltip},
+    OverlayTrigger {trigger: "hover", placement: "left", overlay : timeTooltip},
       div className : "circle pull-right " + if invocation.getTotalTime() > 0 then "slow" else "fast"
 
 

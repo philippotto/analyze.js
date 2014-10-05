@@ -124,8 +124,24 @@ describe("Instrumenter", ->
 
     eval("callAnonymous()")
     expect(protocol.enter.props.name).toBe("anonymousFn")
+  )
 
+  it("can get the original source of nested functions", ->
 
+    code = """
+    function a() {
+      function b() {};
+    }
+    """
+
+    instrumentedCode = instrumenter.instrument(code, "")
+
+    eval(instrumentedCode)
+    [window, called, protocol] = getBasicTracer()
+
+    eval("a()")
+
+    expect(protocol.enter.props.source).toNotContain("traceEnter")
   )
 
 )
