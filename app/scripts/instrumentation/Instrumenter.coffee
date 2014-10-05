@@ -9,8 +9,7 @@ class Instrumenter
 
       parent = node.parent
 
-      # first two parts of condition could be enough?
-      unless parent?.type in ["FunctionDeclaration", "FunctionExpression"]# and node.type is "BlockStatement"
+      unless parent?.type in ["FunctionDeclaration", "FunctionExpression"] and node.type is "BlockStatement"
         return
 
       paramsAsStringArray = _.invoke(node.parent.params, "source")
@@ -39,7 +38,8 @@ class Instrumenter
         eval("throw Error('syntax_valid'); " + newCode)
       catch error
         if error.message != "syntax_valid"
-          console.error("invalid code!!!", newCode)
+          console.error("invalid code!!!")
+          console.log(newCode)
     ).toString()
 
 

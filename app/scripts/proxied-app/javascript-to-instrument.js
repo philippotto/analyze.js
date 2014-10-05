@@ -18,7 +18,23 @@ function c(arg1) {
 
 a('anArg');
 a('anArg', 'anArg');
-a("number", 1234)
-a("object", {})
-a("function", function() {})
-a("array", ["str", 1324])
+a("number", 1234);
+a("object", {});
+a("function", function() {});
+a("array", ["str", 1324]);
+
+
+_.range(100).map(function(el) {
+  el;
+  el + 100;
+  el + el;
+  el;
+  el;
+  el;
+  el;
+  console.log("test",  el);
+  return el * 10;
+})
+
+
+
