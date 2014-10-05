@@ -21,7 +21,7 @@ NavigationView = React.createClass
     brand = R.a href:"#", className:"navbar-brand",
       "analyze.js"
 
-    R.Navbar {inverse: true, brand},
+    R.Navbar {inverse: true, brand, fluid : true},
       R.Nav {},
         R.form className : "navbar-form navbar-left", role : "search",
           R.div className : "form-group",

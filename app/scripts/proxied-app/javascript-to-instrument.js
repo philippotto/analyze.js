@@ -24,7 +24,11 @@ a("function", function() {});
 a("array", ["str", 1324]);
 
 
-_.range(100).map(function(el) {
+var hundredElements = [].slice.apply(new Uint8Array(10));
+
+hundredElements.map(function(el) {
+  function noop() {};
+  noop();
   el;
   el + 100;
   el + el;
@@ -34,7 +38,7 @@ _.range(100).map(function(el) {
   el;
   console.log("test",  el);
   return el * 10;
-})
+});
 
 
 

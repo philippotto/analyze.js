@@ -9,6 +9,7 @@ object_viewer : ObjectViewer
 ###
 
 R = withReact.R
+classSet = React.addons.classSet
 
 App = React.createClass
 
@@ -41,15 +42,27 @@ App = React.createClass
       }))
 
 
-    R.div {},
-      NavigationView { onSearch : @handleSearch, searchQuery : @state.searchQuery }
-      R.div {className : "layout-container"},
-        CallHistoryView {
-          searchQuery : @state.searchQuery
-          callHistoryData : @props.callHistoryData
-          narrowCallHistory : @state.narrowCallHistory,
-          setCurrentFunction
-        }
-        new CodeView({data : @state.currentFunction})
+    callHistoryView = CallHistoryView {
+      searchQuery : @state.searchQuery
+      callHistoryData : @props.callHistoryData
+      narrowCallHistory : @state.narrowCallHistory,
+      setCurrentFunction
+    }
+    codeView = new CodeView(data : @state.currentFunction)
+
+    outerFlexClass = "flexbox-item fill-area flexbox-item-grow"
+    innerFlexClass = "fill-area-content flexbox-item-grow"
+
+    R.div {className : "flexbox-parent"},
+      NavigationView
+        className : "flexbox-item header"
+        onSearch : @handleSearch
+        searchQuery : @state.searchQuery
+      R.div {className : outerFlexClass},
+        R.div {className : innerFlexClass},
+          callHistoryView
+      R.div {className : outerFlexClass + (" flex-zero" if !@state.currentFunction?)},
+        R.div {className : innerFlexClass},
+          codeView
 
 

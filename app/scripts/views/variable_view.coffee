@@ -30,6 +30,9 @@ VariableView = React.createClass
     else if _.isNumber(value)
       span className : "arg-number",
         value
+    else if _.isUndefined(value)
+      span className : "arg-undefined",
+        "undefined"
     else
       span className : "arg-other",
         "Unknown Variable"

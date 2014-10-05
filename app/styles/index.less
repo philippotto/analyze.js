@@ -1,9 +1,6 @@
 @import "bower_components/bootstrap/less/bootstrap.less";
-// @import "main.css";
-// @import (less) "bower_components/foundation/css/foundation.css";
-// @import (less) "bower_components/foundation/css/normalize.css";
 @import "bower_components/font-awesome/less/font-awesome.less";
-
+@import "layout.less";
 
 @monokai-yellow: #E6DB74; // string
 @monokai-purple: #AE81FF; // number
@@ -46,7 +43,7 @@ h1 {
   color: @monokai-green;
 }
 
-.arg-object, .arg-array {
+.arg-object, .arg-array, .arg-function, .arg-undefined {
   font-style: italic;
 }
 
@@ -58,6 +55,8 @@ h1 {
 
 .arg-other { color: @monokai-pink; }
 
+.arg-undefined { color: @monokai-light-gray; }
+
 .invocation-container {
   margin-left: 15px;
 }
@@ -67,41 +66,12 @@ h1 {
   padding: 1px;
 }
 
-.code-view {
-  transition : .2s ease-in-out;
-}
-
-.code-view.invisible {
-  opacity: 0;
-}
-
-//
-// layout
-//
-
-.layout-container {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-content: stretch;
-  align-items: flex-start;
-}
-
-.call-history {
-  order: 0;
-  flex: 1;
-  align-self: flex-start;
-}
+// transition : .2s ease-in-out;
 
 .code-view {
-  order: 1;
-  flex: 1;
-  align-self: flex-end;
-
   width: 100%;
+  border-top: 1px solid @monokai-light-gray;
 }
-
 
 
 // restore default pre style
