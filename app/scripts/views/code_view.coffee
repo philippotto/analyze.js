@@ -15,13 +15,14 @@ CodeView = React.createClass
     className = classSet(
       "code-view" : true
       "invisible" : !@props.data?
+      "javascript" : true
     )
 
     code = if @props.data? then @props.data.getSourceString() else ""
 
     R.div {className, ref : "codeView"},
       R.pre {},
-        R.code {className : "javascript"}
+        R.code {}
           code
 
 

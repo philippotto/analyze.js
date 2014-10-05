@@ -50,21 +50,13 @@ h1 {
   font-style: italic;
 }
 
-.arg-object {
-  color: @monokai-blue;
-}
+.arg-object { color: @monokai-blue; }
 
-.arg-array {
-  color: @monokai-pink;
-}
+.arg-array { color: @monokai-pink; }
 
-.arg-number {
-  color: @monokai-purple;
-}
+.arg-number { color: @monokai-purple; }
 
-.arg-other {
-  color: @monokai-pink;
-}
+.arg-other { color: @monokai-pink; }
 
 .invocation-container {
   margin-left: 15px;
@@ -82,6 +74,34 @@ h1 {
 .code-view.invisible {
   opacity: 0;
 }
+
+//
+// layout
+//
+
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: flex-start;
+}
+
+.call-history {
+  order: 0;
+  flex: 1;
+  align-self: flex-start;
+}
+
+.code-view {
+  order: 1;
+  flex: 1;
+  align-self: flex-end;
+
+  width: 100%;
+}
+
 
 
 // restore default pre style

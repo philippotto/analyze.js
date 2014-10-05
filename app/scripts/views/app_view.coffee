@@ -43,13 +43,13 @@ App = React.createClass
 
     R.div {},
       NavigationView { onSearch : @handleSearch, searchQuery : @state.searchQuery }
-      R.div {className : "container"},
+      R.div {className : "layout-container"},
         CallHistoryView {
           searchQuery : @state.searchQuery
           callHistoryData : @props.callHistoryData
           narrowCallHistory : @state.narrowCallHistory,
           setCurrentFunction
         }
-      new CodeView({data : @state.currentFunction})
+        new CodeView({data : @state.currentFunction})
 
 
