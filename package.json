@@ -36,7 +36,8 @@
     "transformer-proxy": "*",
     "supervisor": "^0.6.0",
     "coffee-script": "^1.8.0",
-    "require-sugar": "^0.1.2"
+    "require-sugar": "^0.1.2",
+    "falafel": "^0.3.1"
   },
   "scripts": {
     "postinstall": "bower install && gulp",
