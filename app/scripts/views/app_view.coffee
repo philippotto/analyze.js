@@ -60,6 +60,13 @@ App = React.createClass
     outerFlexClass = "flexbox-item fill-area flexbox-item-grow"
     innerFlexClass = "fill-area-content flexbox-item-grow"
 
+    codeClasses = classSet(
+      "outerFlexClass" : true
+      "lower-pane" : true
+      "flex-fixed" : true
+      "flex-zero" : !@state.currentFunction?
+    )
+
     R.div {className : "flexbox-parent"},
       NavigationView
         className : "flexbox-item header"
@@ -68,7 +75,7 @@ App = React.createClass
       R.div {className : outerFlexClass},
         R.div {className : innerFlexClass},
           callHistoryView
-      R.div {className : outerFlexClass + (" flex-zero" if !@state.currentFunction?)},
+      R.div {className : codeClasses},
         R.div {className : innerFlexClass},
           codeView
 
