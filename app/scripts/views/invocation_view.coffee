@@ -79,7 +79,7 @@ Invocation = React.createClass
       div className : "circle pull-right " + if invocation.getTotalTime() > 0 then "slow" else "fast"
 
 
-  getToggler: ->
+  getToggler : ->
 
     if @props.invocation.hasChildren()
       div {
@@ -89,12 +89,31 @@ Invocation = React.createClass
       }
 
 
-  getStyle: ->
+  matches : (searchQuery) ->
 
-    matches = @props.invocation.matches(@props.searchQuery)
+    @props.invocation.matches(searchQuery)
+
+
+  getStyle : ->
+
+    matches = @matches(@props.searchQuery)
     return display : if matches and not @props.hidden then "block" else "none"
 
 
   logInvocation : ->
 
     console.log("invocation",  @props.invocation)
+
+
+  shouldComponentUpdate : (nextProps, nextState) ->
+
+    @props.invocation.getDirty() or
+      @props.hidden != nextProps.hidden or
+      @props.collapsed != nextProps.collapsed or
+      @matches(@props.searchQuery) != @matches(nextProps.searchQuery)
+
+
+  componentDidMount : -> @props.invocation.setDirty(false)
+
+  componentDidUpdate : -> @props.invocation.setDirty(false)
+

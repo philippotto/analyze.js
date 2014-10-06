@@ -23,8 +23,7 @@ a("object", {});
 a("function", function() {});
 a("array", ["str", 1324]);
 
-
-var hundredElements = [].slice.apply(new Uint8Array(10));
+var hundredElements = [].slice.apply(new Uint8Array(100));
 
 hundredElements.map(function(el) {
   function noop() {};
@@ -40,5 +39,21 @@ hundredElements.map(function(el) {
   return el * 10;
 });
 
-
+setTimeout(
+  function() {
+    hundredElements.map(function(el) {
+      function noop() {};
+      noop();
+      el;
+      el + 100;
+      el + el;
+      el;
+      el;
+      el;
+      el;
+      return el * 10;
+    });
+  },
+  2000
+)
 

@@ -26,10 +26,12 @@ views/app_view : AppView
       =>
         callHistoryData = app.tracer.getRoot()
 
+        console.time("renderComponent")
         React.renderComponent(
           AppView {callHistoryData}
           document.getElementById("main")
         )
+        console.timeEnd("renderComponent")
       500
       leading : true
     )

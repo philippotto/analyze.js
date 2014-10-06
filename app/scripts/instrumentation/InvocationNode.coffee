@@ -5,6 +5,7 @@
 class InvocationNode
 
   constructor : (@jsFunction, params, @context) ->
+
     if params
       @params = [].slice.call(params)
     else
@@ -12,21 +13,36 @@ class InvocationNode
     @children = []
     @startTime = performance.now()
     @changedDOM = false
+    @dirty = true
+    @isRoot = false
+
 
   addChild : (child) ->
+
     @children.push child
+    @setDirty(true)
+
 
   stopInvocation : (@returnValue, @thrownException) ->
+
     @endTime = performance.now()
+    @setDirty(true)
+
+
+  setDirty : (bool) -> @dirty = bool
+
+  getDirty : -> @dirty
 
   changesDOM : (bool) ->
+
     if arguments.length == 0
       return @changedDOM
     else
       @changedDOM = bool
+      @setDirty(true)
 
-  getTotalTime : ->
-    @endTime - @startTime
+
+  getTotalTime : -> @endTime - @startTime
 
   getPureTime : ->
 
@@ -35,11 +51,10 @@ class InvocationNode
       0
     )
 
-  getArguments : ->
-    @params
 
-  getContext : ->
-    @context
+  getArguments : -> @params
+
+  getContext : -> @context
 
   getViewableArguments : ->
 
@@ -78,6 +93,10 @@ class InvocationNode
 
 
   matches : (query) ->
+
+    if @isRoot
+      # is it conceptionally sensible that the root is asked whether it matches?
+      return true
 
     return @jsFunction.matches(query)
 

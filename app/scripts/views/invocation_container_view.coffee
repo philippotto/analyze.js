@@ -21,6 +21,15 @@ InvocationContainerView = React.createClass
 
   render : ->
 
+    invocationView = InvocationView(
+      invocation : @props.invocation
+      searchQuery : @props.searchQuery
+      collapsed : @state.collapsed
+      hidden : @props.hidden
+      toggleCollapsing : @collapse
+      setCurrentFunction : @props.setCurrentFunction
+    )
+
     invocationNodes = @props.invocation.children.map (invocation) =>
       InvocationContainerView {
         invocation
@@ -30,15 +39,9 @@ InvocationContainerView = React.createClass
         setCurrentFunction : @props.setCurrentFunction
       }
 
+
     R.div {className : "invocation-container"},
-      InvocationView(
-        invocation : @props.invocation
-        searchQuery : @props.searchQuery
-        collapsed : @state.collapsed
-        hidden : @props.hidden
-        toggleCollapsing : @collapse
-        setCurrentFunction : @props.setCurrentFunction
-      )
+      invocationView
       invocationNodes
 
 

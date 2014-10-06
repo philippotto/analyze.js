@@ -19,8 +19,10 @@ App = React.createClass
     narrowCallHistory : false
     currentFunction : null
 
+
   handleSearch : (searchQuery) ->
 
+    console.time("handleSearch")
     @setState {searchQuery}
 
 
@@ -30,6 +32,11 @@ App = React.createClass
       narrowCallHistory :
         $apply : (b) -> !b
     ))
+
+
+  componentDidUpdate : ->
+
+    console.timeEnd("handleSearch")
 
 
   render : ->
