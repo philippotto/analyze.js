@@ -12,7 +12,7 @@
 @monokai-gray: #272822; // background
 @monokai-dark-gray: #49483E; // highlight
 @monokai-light-gray: #75715E; // comment
-
+@monokai-dark-silver: #404040; // menu
 
 h1 {
   font-size: 50*2px;
@@ -71,6 +71,22 @@ h1 {
 .code-view {
   width: 100%;
   border-top: 1px solid @monokai-light-gray;
+}
+
+
+// monokai popover
+
+.popover {
+  background-color: @monokai-dark-silver;
+}
+
+.popover.right > .arrow:after {
+  border-right-color: @monokai-dark-silver;
+}
+
+.popover-title {
+  background-color: @monokai-dark-silver;
+  border-bottom: 1px solid @monokai-dark-gray;
 }
 
 
