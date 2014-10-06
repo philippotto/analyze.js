@@ -6,7 +6,7 @@ serveStatic = require("serve-static")
 finalhandler = require("finalhandler")
 errorhandler = require("errorhandler")
 Instrumenter = require("../instrumentation/Instrumenter.js")
-
+argv = require("minimist")(process.argv.slice(2))
 
 transformerFunction = (data, req) ->
   instrumenter.instrument(data.toString(), req.url)
@@ -20,8 +20,8 @@ isJavaScript = (req) ->
   /\.js([^\w]|$)/.test req.url
 
 
-proxiedPort = 3000
-proxyPort = 8013
+proxiedPort = argv.proxiedPort or 3000
+proxyPort = argv.proxyPort or 8013
 
 app = connect()
 
