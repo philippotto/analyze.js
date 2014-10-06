@@ -59,9 +59,9 @@ Invocation = React.createClass
       new VariableView(data : arg)
     ).reduce(
       (acc, el, index, array) ->
-        acc.push(el)
+        acc.push(span {key : "arg-" + index}, el)
         if index < array.length - 1
-          acc.push(span {}, ", ")
+          acc.push(span {key : "arg-," + index}, ", ")
         acc
       []
     )
