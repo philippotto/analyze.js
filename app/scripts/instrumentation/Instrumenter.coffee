@@ -45,9 +45,6 @@ class Instrumenter
 
   generateMetaInfo : (codeString, fileURL, node, params) ->
 
-    # don't use node.source() to avoid saving the instrumented source
-    source = "".slice.apply(codeString, node.range)
-
     if not node.id?
       alternateName = switch node.parent.type
         when "VariableDeclarator"
@@ -63,6 +60,9 @@ class Instrumenter
     name = node.id.name
     range = node.range
 
+    # don't use node.source() to avoid saving the instrumented source
+    source = "".slice.apply(codeString, range)
+
     fnID = [fileURL, name, range].join("-")
     fnProperties = JSON.stringify { fileURL, source, name, range, params }
 
@@ -70,6 +70,3 @@ class Instrumenter
 
 
 module.exports = Instrumenter
-
-
-
