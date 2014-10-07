@@ -45,12 +45,25 @@ class Instrumenter
 
   generateMetaInfo : (codeString, fileURL, node, params) ->
 
+    father = node.parent
+
     if not node.id?
-      alternateName = switch node.parent.type
+
+      alternateName = switch father.type
         when "VariableDeclarator"
-          node.parent.id.name
+          father.id.name
         when "Property"
-          node.parent.key.name
+          father.key.name
+        when "MemberExpression"
+          # could be something like {a : function() {}.bind(this)}
+          grandpa = father.parent
+          greatGrandpa = grandpa.parent
+
+          if grandpa.type == "CallExpression" and greatGrandpa.type == "Property"
+            greatGrandpa.key.name
+          else
+            "anonymousFn"
+
         else
           "anonymousFn"
 

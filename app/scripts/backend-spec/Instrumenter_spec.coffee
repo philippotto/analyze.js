@@ -89,7 +89,8 @@ describe("Instrumenter", ->
     function a() {};
     var b = function() {};
     var obj = {
-      c : function() {}
+      c : function() {},
+      d : function() { var d; }.bind(this)
     }
     var caller = function(cb) { cb(); };
     var callNamed = function() {
@@ -114,6 +115,9 @@ describe("Instrumenter", ->
 
     eval("obj.c()")
     expect(protocol.enter.props.name).toBe("c")
+
+    eval("obj.d()")
+    expect(protocol.enter.props.name).toBe("d")
 
     eval("callNamed()")
     expect(protocol.enter.props.name).toBe("namedFunction")
