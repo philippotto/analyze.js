@@ -12,13 +12,15 @@ analyze.js is currently work in progress.
 
 ## How to use
 
+Let's say you got an app running on localhost:proxiedPort. In order to analyze the app, analyze.js will create a proxy server (running on localhost:proxyPort), which you can visit to see the original app and the analyzation results.
+
+Follow these steps to set up analyze.js:
+
 - Checkout this repository (analyze.js isn't available via npm yet)
 - cd into the project directory
 - ```npm install```
-- ```gulp watch --proxiedPort 4000 --proxyPort 3000```
-  - This assumes, the app you want to analyze runs on port 4000.
-- Visit [localhost:3000/analyze.js/](http://localhost:3000/analyze.js/) in your browser (preferably Chrome; other browsers are not tested, yet)
-  - If you changed --proxyPort when running gulp, adapt the port number accordingly.
+- ```gulp watch --proxiedPort proxiedPort --proxyPort proxyPort```
+- Visit __[localhost:3000/analyze.js/](http://localhost:proxyPort/analyze.js/)__ in your browser (preferably Chrome; other browsers are not tested, yet)
 
 ## License
 
