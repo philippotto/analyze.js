@@ -7,7 +7,12 @@ analyze.js consists of:
 - a back-end which proxies a local webapp and instruments requested JavaScript files on the fly
 - a front-end which provides an overview of the analyzed characteristics
 
-analyze.js is currently work in progress.
+__analyze.js is currently work in progress.__
+
+
+## Motivation
+
+The main goal of analyze.js is to simplify understanding of code (especially in large code bases). Common use cases are  familiarizing with a project as well as refactoring, debugging and reverse engineering. Optimizing performance is also a possible use case, but it is not a central goal since there are already other very good tools faciliting this (especially the Chrome Dev Tools).
 
 
 ## How to use
