@@ -17,6 +17,7 @@ The main goal of analyze.js is to simplify understanding of code (especially in 
 
 ## How to use
 
+analyze.js functions as a proxy so that web apps can be analyzed very easily without having to integrate in a certain build system or back-end.
 Let's say you got an app running on localhost:proxiedPort. In order to analyze the app, analyze.js will create a proxy server (running on localhost:proxyPort), which you can visit to see the original app and the analyzation results.
 
 Follow these steps to set up analyze.js:
