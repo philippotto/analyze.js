@@ -27,3 +27,7 @@ CodeView = React.createClass
 
   componentDidUpdate : -> @highlightBlock()
 
+  shouldComponentUpdate : (nextProps, nextState) ->
+
+    console.log("@props.data != nextProps.data",  @props.data != nextProps.data)
+    @props.data != nextProps.data

@@ -88,6 +88,7 @@ describe("Instrumenter", ->
     fnCode = """
     function a() {};
     var b = function() {};
+    var bb = function() {}.bind(this);
     var obj = {
       c : function() {},
       d : function() { var d; }.bind(this)
@@ -112,6 +113,9 @@ describe("Instrumenter", ->
 
     eval("b()")
     expect(protocol.enter.props.name).toBe("b")
+
+    eval("bb()")
+    expect(protocol.enter.props.name).toBe("bb")
 
     eval("obj.c()")
     expect(protocol.enter.props.name).toBe("c")

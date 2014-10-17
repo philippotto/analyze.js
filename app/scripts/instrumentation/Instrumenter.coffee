@@ -51,21 +51,25 @@ class Instrumenter
 
       alternateName = switch father.type
         when "VariableDeclarator"
+          # var a = function() {}
           father.id.name
         when "Property"
+          # { a : function() {} }
           father.key.name
         when "MemberExpression"
-          # could be something like {a : function() {}.bind(this)}
           grandpa = father.parent
           greatGrandpa = grandpa.parent
 
-          if grandpa.type == "CallExpression" and greatGrandpa.type == "Property"
-            greatGrandpa.key.name
-          else
-            "anonymousFn"
+          if grandpa.type == "CallExpression"
+            if greatGrandpa.type == "VariableDeclarator"
+              # something like var a = function() {}.bind(this)
+              greatGrandpa.id.name
+            else if greatGrandpa.type == "Property"
+              # something like {a : function() {}.bind(this)}
+              greatGrandpa.key.name
 
-        else
-          "anonymousFn"
+      alternateName ||= "anonymousFn"
+
 
       node.id =
         name : alternateName
