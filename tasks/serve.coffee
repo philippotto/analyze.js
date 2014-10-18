@@ -5,14 +5,22 @@ module.exports = (gulp, $, options) ->
 
   getCmds = ->
 
-    supervisorCmd = ["./node_modules/supervisor/lib/cli-wrapper.js", "--force-watch", "-w", "dist/scripts/backend/."]
-    proxyArgs = ["dist/scripts/backend/instrumentation-proxy.js"]
+    supervisorCmd = [
+      "./node_modules/supervisor/lib/cli-wrapper.js"
+      "--force-watch"
+      "-w"
+      "dist/scripts/backend/."
+      "--no-restart-on"
+      "error"
+    ]
+
+    proxyArgs = ["--", "dist/scripts/backend/instrumentation-proxy.js"]
     proxiedArgs = ["dist/scripts/backend/proxied-app.js"]
 
     if argv.proxiedPort
-      proxyArgs.push(" --proxiedPort " + argv.proxiedPort)
+      proxyArgs.push("--proxiedPort", argv.proxiedPort)
     if argv.proxyPort
-      proxyArgs.push(" --proxyPort " + argv.proxyPort)
+      proxyArgs.push("--proxyPort", argv.proxyPort)
 
     {supervisorCmd, proxyArgs, proxiedArgs}
 

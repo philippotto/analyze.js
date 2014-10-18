@@ -48,7 +48,8 @@
     "postinstall": "bower install && gulp",
     "test": "node_modules/.bin/jasmine-node dist/scripts/backend-spec",
     "atest": "node_modules/.bin/jasmine-node --autotest dist/scripts/backend-spec",
-    "ktest": "node_modules/.bin/karma start --single-run --browsers PhantomJS"
+    "ktest": "node_modules/.bin/karma start --single-run --browsers PhantomJS",
+    "help": "gulp help"
   },
   "devDependencies": {
     "browser-sync": "^1.3.3",
