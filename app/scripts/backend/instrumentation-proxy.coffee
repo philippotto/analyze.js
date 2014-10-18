@@ -53,5 +53,6 @@ console.log "The proxied server listens on", proxiedPort
 console.log "The proxy server listens on", proxyPort
 
 
-process.on "uncaughtException", (msg) ->
-  console.log "error:", msg
+process.on "uncaughtException", (error) ->
+  console.error("stack:", error.stack)
+  console.error("error:", error)

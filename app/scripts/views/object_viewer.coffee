@@ -2,7 +2,7 @@
 react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
-./Formatter : Formatter
+../Formatter : Formatter
 ###
 
 ObjectViewer = React.createClass

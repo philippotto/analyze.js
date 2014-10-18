@@ -12,6 +12,7 @@ class Router extends UberRouter
 
   routes :
     "analyzejs/index.html" : "home"
+    "analyzejs/" : "home"
 
   whitelist : []
 
