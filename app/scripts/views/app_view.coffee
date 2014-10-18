@@ -2,7 +2,7 @@
 react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
-object_viewer : ObjectViewer
+./object_viewer : ObjectViewer
 ./navigation_view : NavigationView
 ./callhistory_view : CallHistoryView
 ./code_view : CodeView

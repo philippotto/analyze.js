@@ -2,9 +2,9 @@
 react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
-object_viewer : ObjectViewer
 instrumentation/CallGraph : CallGraph
 instrumentation/Tracer : Tracer
+views/object_viewer : ObjectViewer
 views/app_view : AppView
 ###
 
