@@ -26,7 +26,8 @@ Follow these steps to set up analyze.js:
 - cd into the project directory
 - ```npm install```
 - ```gulp watch --proxiedPort proxiedPort --proxyPort proxyPort```
-- Visit __[localhost:3000/analyze.js/](http://localhost:proxyPort/analyze.js/)__ in your browser (preferably Chrome; other browsers are not tested, yet)
+- Visit __localhost:proxyPort/analyzejs/__ in your browser (preferably Chrome; other browsers are not tested, yet)
+  - When the site is loaded, localhost:proxiedPort will be opened automatically in a new window (check your popup blocker!).
 
 ## License
 
