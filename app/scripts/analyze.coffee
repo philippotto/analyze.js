@@ -34,5 +34,6 @@ views/app_view : AppView
         console.timeEnd("renderComponent")
       500
       leading : true
+      maxWait : 2000
     )
   )
