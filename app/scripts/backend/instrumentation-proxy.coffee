@@ -17,7 +17,7 @@ isNativeCode = (req) ->
 
 
 isJavaScript = (req) ->
-  /\.js([^\w]|$)/.test req.url
+  /\.js([^\w.\/]|$)/.test req.url
 
 
 proxiedPort = argv.proxiedPort or 3000
