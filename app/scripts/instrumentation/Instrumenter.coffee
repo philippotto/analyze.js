@@ -5,8 +5,22 @@ class Instrumenter
 
   instrument : (codeString, fileURL) ->
 
+    blacklist = [
+      "backbone.marionette.js"
+      "jquery.js"
+      "require.js"
+      "lodash.js"
+      "backbone.js"
+    ]
+
+    if fileURL and _.any(blacklist, (el) -> fileURL.indexOf(el) > -1)
+      console.log("don't instrument blacklisted", fileURL)
+      return codeString
+
+
+
     try
-      falafel(codeString, (node) =>
+      return falafel(codeString, (node) =>
 
         parent = node.parent
 
@@ -44,7 +58,7 @@ class Instrumenter
       ).toString()
 
     catch e
-      console.error("error at transforming",  fileURL, "is it JavaScript?")
+      console.error("error at transforming", fileURL, "is it JavaScript? file will stay gracefully untouched.")
       return codeString
 
 

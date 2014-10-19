@@ -11,14 +11,21 @@ views/app_view : AppView
 ->
 
   app.tracer = new Tracer(new CallGraph(), true)
-  analyzee = window.open("", "analyzee")
 
-  forceRefresh = true
+  # delay in order to avoid mysterious race conditions
+  # (sometimes analyzee cannot access window.app)
+  _.delay(
+    ->
+      analyzee = window.open("", "analyzee")
 
-  if forceRefresh or analyzee.location.href == "about:blank"
-    analyzee.location.href = document.location.origin
+      forceRefresh = true
 
-  analyzee.focus()
+      if forceRefresh or analyzee.location.href == "about:blank"
+        analyzee.location.href = document.location.origin
+
+      analyzee.focus()
+    1000
+  )
 
   app.commands.setHandler(
     "renderCallGraph"
@@ -34,6 +41,6 @@ views/app_view : AppView
         console.timeEnd("renderComponent")
       500
       leading : true
-      maxWait : 2000
+      maxWait : 60000
     )
   )

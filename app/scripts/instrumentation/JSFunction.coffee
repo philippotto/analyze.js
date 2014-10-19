@@ -15,6 +15,6 @@ class JSFunction
 
   matches : (query) ->
 
-    _.any([@getName(), @getFileURL()], (property) ->
+    return _.any([@getName(), @getFileURL()], (property) ->
       property.toLowerCase().indexOf(query.toLowerCase()) > -1
     )
