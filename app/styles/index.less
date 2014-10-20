@@ -36,21 +36,22 @@ h1 {
   color: @monokai-white;
 }
 
-.arg-string {
+.arg-string, .arg-date {
   color: @monokai-yellow;
 }
+
 
 .arg-function {
   color: @monokai-green;
 }
 
-.arg-object, .arg-array, .arg-function, .arg-undefined {
+.arg-object, .arg-arguments, .arg-function, .arg-undefined, .arg-null {
   font-style: italic;
 }
 
 .arg-object { color: @monokai-blue; }
 
-.arg-array { color: @monokai-pink; }
+.arg-array, .arg-arguments { color: @monokai-pink; }
 
 .arg-number { color: @monokai-purple; }
 
@@ -58,7 +59,7 @@ h1 {
 
 .arg-other { color: @monokai-pink; }
 
-.arg-undefined { color: @monokai-light-gray; }
+.arg-undefined, .arg-null { color: @monokai-light-gray; }
 
 .invocation-container {
   margin-left: 15px;

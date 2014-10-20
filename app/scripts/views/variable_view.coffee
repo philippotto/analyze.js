@@ -24,18 +24,27 @@ VariableView = React.createClass
     else if _.isArray(value)
       span className : "arg-array",
         "Array"
-    else if _.isObject(value)
-      span className : "arg-object",
-        "Object"
+    else if _.isArguments(value)
+      span className : "arg-arguments",
+        "arguments"
+    else if _.isDate(value)
+      span className : "arg-date",
+        value.toLocaleDateString()
     else if _.isNumber(value)
       span className : "arg-number",
         value
-    else if _.isUndefined(value)
-      span className : "arg-undefined",
-        "undefined"
     else if _.isBoolean(value)
       span className : "arg-boolean",
         value + ""
+    else if _.isUndefined(value)
+      span className : "arg-undefined",
+        "undefined"
+    else if value == null
+      span className : "arg-null",
+        "null"
+    else if _.isObject(value)
+      span className : "arg-object",
+        "Object"
     else
       span className : "arg-other",
         "Unknown Variable"

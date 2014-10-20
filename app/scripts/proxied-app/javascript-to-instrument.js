@@ -12,7 +12,7 @@ function b(arg1) {
 }
 
 function c(arg1) {
-  return "c" + a(arg1, "c is calling");
+  return "c" + a(arg1, "c is calling", arguments, new Date(), undefined);
 }
 
 
@@ -22,6 +22,7 @@ a("number", 1234);
 a("object", {});
 a("function", function() {});
 a("array", ["str", 1324]);
+
 
 var hundredElements = [].slice.apply(new Uint8Array(100));
 
