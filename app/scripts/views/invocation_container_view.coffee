@@ -30,14 +30,19 @@ InvocationContainerView = React.createClass
       setCurrentFunction : @props.setCurrentFunction
     )
 
-    invocationNodes = @props.invocation.children.map (invocation) =>
-      InvocationContainerView {
-        invocation
-        searchQuery : @props.searchQuery
-        hidden : @props.hidden or @state.collapsed
-        key : "invocation-container-" + invocation.id
-        setCurrentFunction : @props.setCurrentFunction
-      }
+    invocationNodes = []
+
+    # Dirty hack so that only 500 containers are rendered
+    if @props.invocation.isRoot or @props.invocation.id < 500
+
+      invocationNodes = @props.invocation.children.map (invocation) =>
+        InvocationContainerView {
+          invocation
+          searchQuery : @props.searchQuery
+          hidden : @props.hidden or @state.collapsed
+          key : "invocation-container-" + invocation.id
+          setCurrentFunction : @props.setCurrentFunction
+        }
 
 
     R.div {className : "invocation-container"},

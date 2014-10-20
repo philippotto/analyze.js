@@ -33,6 +33,10 @@ views/app_view : AppView
       =>
         callHistoryData = app.tracer.getRoot()
 
+        if window.location.href.indexOf("norender") > -1
+          return
+
+
         console.time("renderComponent")
         React.renderComponent(
           AppView {callHistoryData}

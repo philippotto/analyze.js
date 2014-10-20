@@ -11,7 +11,7 @@ with_react : withReact
 R = withReact.R
 classSet = React.addons.classSet
 
-App = React.createClass
+AppView = React.createClass
 
   getInitialState : ->
 
