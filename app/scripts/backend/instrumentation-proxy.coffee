@@ -5,7 +5,7 @@ transformerProxy = require("transformer-proxy")
 serveStatic = require("serve-static")
 finalhandler = require("finalhandler")
 errorhandler = require("errorhandler")
-Instrumenter = require("../instrumentation/Instrumenter.js")
+Instrumenter = require("./instrumenter.js")
 argv = require("minimist")(process.argv.slice(2))
 
 transformerFunction = (data, req) ->

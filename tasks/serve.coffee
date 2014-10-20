@@ -37,7 +37,7 @@ module.exports = (gulp, $, options) ->
 
     {supervisorCmd, proxyArgs, proxiedArgs} = getCmds()
 
-    spawnAndLog("proxy-child", "node", supervisorCmd.concat(proxyArgs))
+    spawnAndLog("proxy-child  ", "node", supervisorCmd.concat(proxyArgs))
 
     if argv.proxiedPort
       # assume that a different webapp is already running

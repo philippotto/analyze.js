@@ -1,23 +1,23 @@
 falafel = require("falafel")
 _ = require("lodash")
+fs = require('fs')
 
 class Instrumenter
 
+  isBlacklisted : (fileURL)  ->
+
+    @blacklist ||= fs.readFileSync('blacklist.txt', 'utf8')
+      .split("\n")
+      .map((el) -> el.trim())
+
+    return fileURL and _.any(@blacklist, (el) -> el and fileURL.indexOf(el) > -1)
+
+
   instrument : (codeString, fileURL) ->
 
-    blacklist = [
-      "backbone.marionette.js"
-      "jquery.js"
-      "require.js"
-      "lodash.js"
-      "backbone.js"
-    ]
-
-    if fileURL and _.any(blacklist, (el) -> fileURL.indexOf(el) > -1)
+    if @isBlacklisted(fileURL)
       console.log("don't instrument blacklisted", fileURL)
       return codeString
-
-
 
     try
       return falafel(codeString, (node) =>

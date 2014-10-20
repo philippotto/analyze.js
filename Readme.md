@@ -12,13 +12,16 @@ __analyze.js is currently work in progress.__
 
 ## Motivation
 
-The main goal of analyze.js is to simplify understanding of code (especially in large code bases). Common use cases are  familiarizing with a project as well as refactoring, debugging and reverse engineering. Optimizing performance is also a possible use case, but it is not a central goal since there are already other very good tools faciliting this (especially the Chrome Dev Tools).
+The main goal of analyze.js is to simplify understanding of code (especially in large code bases).
+Common use cases are  familiarizing with a project as well as refactoring, debugging and reverse engineering.
+Optimizing performance is also a possible use case, but it is not a central goal since there are already other very good tools faciliting this (especially the Chrome Dev Tools).
 
 
 ## How to use
 
 analyze.js functions as a proxy so that web apps can be analyzed very easily without having to integrate in a certain build system or back-end.
-Let's say you got an app running on localhost:proxiedPort. In order to analyze the app, analyze.js will create a proxy server (running on localhost:proxyPort), which you can visit to see the original app and the analyzation results.
+Let's say you got an app running on localhost:proxiedPort.
+In order to analyze the app, analyze.js will create a proxy server (running on localhost:proxyPort), which you can visit to see the original app and the analyzation results.
 
 Follow these steps to set up analyze.js:
 
@@ -43,12 +46,17 @@ Check your popup blocker. analyze.js will open localhost:proxyPort in a new wind
 
 __Why aren't there any calls to jQuery/requireJS/XYZ?__
 
-At the moment there is a blacklist of common libraries and frameworks which don't get instrumented. Since these JavaScript files tend to get called __very__ often and are usually not of interest, they will be ignored. This enhances performance when running the analyzed webapp and when rendering the front-end.
+At the moment there is a blacklist of common libraries and frameworks which don't get instrumented (```blacklist.txt```).
+Since these JavaScript files tend to get called __very__ often and are usually not of interest, they will be ignored.
+This enhances performance when running the analyzed webapp and when rendering the front-end.
 
 
 __Why is analyze.js so slow?__
 
-Presumably, your webapp uses a library/framework which gets called __very__ often, but isn't blacklisted (see the previous question). Please open an issue. The blacklist will be configurable in the near future. Additionally, I'm working on tuning performance.
+Presumably, your webapp uses a library/framework which gets called __very__ often, but isn't blacklisted (see the previous question).
+Please extend ```blacklist.txt``` or open an issue.
+Currently, I'm working on tuning performance.
+Maybe you want to check back in a few weeks.
 
 
 __Can I get notified about future releases of analyze.js?__
