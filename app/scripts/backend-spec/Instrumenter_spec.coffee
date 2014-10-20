@@ -1,4 +1,4 @@
-Instrumenter = require("../backend/Instrumenter.js")
+Instrumenter = require("../backend/instrumenter.js")
 instrumenter = new Instrumenter()
 
 

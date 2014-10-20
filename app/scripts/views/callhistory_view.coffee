@@ -4,7 +4,6 @@ react-bootstrap : ReactBootstrap
 with_react : withReact
 ./object_viewer : ObjectViewer
 ./invocation_view : InvocationView
-
 ###
 
 R = withReact.R
@@ -39,13 +38,6 @@ CallHistoryView = React.createClass
 
     @visiblePages = visiblePages
     @forceUpdate()
-
-
-  getInitialState : ->
-
-    rootInvocation :
-      children : []
-      isRoot : true
 
 
   render : ->
