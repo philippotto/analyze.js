@@ -7,8 +7,9 @@ class CallGraph
 
   constructor : ->
     @invocationIDCounter = 0
-    @root = new InvocationNode()
+    @root = new InvocationNode({level: 0})
     @root.isRoot = true
+    @root.id = -1
     @activeNode = @root
 
   resetToRoot : ->

@@ -97,7 +97,10 @@ Invocation = React.createClass
   getStyle : ->
 
     matches = @matches(@props.searchQuery)
-    return display : if matches and not @props.hidden then "block" else "none"
+    return {
+      display : if matches and not @props.hidden then "block" else "none"
+      "margin-left": 15 * (@props.invocation.level + 1)
+    }
 
 
   logInvocation : ->

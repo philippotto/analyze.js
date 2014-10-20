@@ -4,7 +4,7 @@
 
 class InvocationNode
 
-  constructor : (@jsFunction, params, @context) ->
+  constructor : ({@jsFunction, params, @context, @level}) ->
 
     if params
       @params = [].slice.call(params)
