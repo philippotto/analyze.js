@@ -31,15 +31,14 @@ views/app_view : AppView
     "renderCallGraph"
     _.debounce(
       =>
-        callHistoryData = app.tracer.getRoot()
+        callGraph = app.tracer.callGraph
 
         if window.location.href.indexOf("norender") > -1
           return
 
-
         console.time("renderComponent")
         React.renderComponent(
-          AppView {callHistoryData}
+          AppView {callGraph}
           document.getElementById("main")
         )
         console.timeEnd("renderComponent")
