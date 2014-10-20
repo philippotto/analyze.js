@@ -51,7 +51,7 @@ AppView = React.createClass
 
     callHistoryView = CallHistoryView {
       searchQuery : @state.searchQuery
-      callHistoryData : @props.callHistoryData
+      callGraph : @props.callGraph
       narrowCallHistory : @state.narrowCallHistory,
       setCurrentFunction
     }
@@ -73,8 +73,7 @@ AppView = React.createClass
         onSearch : @handleSearch
         searchQuery : @state.searchQuery
       R.div {className : outerFlexClass},
-        R.div {className : innerFlexClass},
-          callHistoryView
+        callHistoryView
       R.div {className : codeClasses},
         R.div {className : innerFlexClass},
           codeView

@@ -4,7 +4,7 @@
 
 class InvocationNode
 
-  constructor : (@jsFunction, params, @context) ->
+  constructor : ({@jsFunction, params, @context, @level}) ->
 
     if params
       @params = [].slice.call(params)
@@ -15,6 +15,12 @@ class InvocationNode
     @changedDOM = false
     @dirty = true
     @isRoot = false
+    @isCollapsed = false
+
+
+  toggleCollapsing : ->
+
+    @isCollapsed = !@isCollapsed
 
 
   addChild : (child) ->
