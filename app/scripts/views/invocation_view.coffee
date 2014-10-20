@@ -81,24 +81,21 @@ Invocation = React.createClass
 
   getToggler : ->
 
-    if @props.invocation.hasChildren()
+    invocation = @props.invocation
+
+    if invocation.hasChildren()
       div {
-        className: "triangle " + if @props.collapsed then "closed" else "open"
+        className: "triangle " + if invocation.isCollapsed then "closed" else "open"
         ref : "collapseToggler"
-        onClick : @props.toggleCollapsing
+        onClick : =>
+          invocation.toggleCollapsing()
+          @props.forceUpdate()
       }
-
-
-  matches : (searchQuery) ->
-
-    @props.invocation.matches(searchQuery)
 
 
   getStyle : ->
 
-    matches = @matches(@props.searchQuery)
     return {
-      display : if matches and not @props.hidden then "block" else "none"
       "margin-left": 15 * (@props.invocation.level + 1)
     }
 
@@ -106,14 +103,6 @@ Invocation = React.createClass
   logInvocation : ->
 
     console.log("invocation",  @props.invocation)
-
-
-  shouldComponentUpdate : (nextProps, nextState) ->
-
-    @props.invocation.getDirty() or
-      @props.hidden != nextProps.hidden or
-      @props.collapsed != nextProps.collapsed or
-      @matches(@props.searchQuery) != @matches(nextProps.searchQuery)
 
 
   componentDidMount : -> @props.invocation.setDirty(false)

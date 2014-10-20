@@ -39,15 +39,18 @@ class CallGraph
     @activeNode?.changesDOM(true)
 
 
-  collectInvocations : (root, n, nodes = []) ->
+  collectInvocations : (root, n, searchQuery, nodes = []) ->
 
     if nodes.length == n
       return nodes
 
-    nodes.push(root)
-    root.children.forEach((childNode) =>
-      @collectInvocations(childNode, n, nodes)
-    )
+    if root.matches(searchQuery)
+      nodes.push(root)
+
+    unless root.isCollapsed
+      root.children.forEach((childNode) =>
+        @collectInvocations(childNode, n, searchQuery, nodes)
+      )
 
     return nodes
 

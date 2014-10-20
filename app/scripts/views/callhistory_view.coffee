@@ -80,7 +80,13 @@ CallHistoryView = React.createClass
     if not @counter
       @counter = 0
 
-    @collectedInvocations = callGraph.collectInvocations(root, callGraph.getSize())
+    @collectedInvocations = callGraph.collectInvocations(
+      root
+      callGraph.getSize()
+      @props.searchQuery
+    )
+
+    boundForceUpdateFn = @forceUpdate.bind(@)
 
     elements = @visiblePages.map((i) =>
       return @collectedInvocations
@@ -89,17 +95,14 @@ CallHistoryView = React.createClass
           InvocationView(
             invocation : invocation
             searchQuery : @props.searchQuery
-            collapsed : false #@state.collapsed
-            hidden : false #@props.hidden
-            toggleCollapsing : -> # @collapse
+            forceUpdate : boundForceUpdateFn
             setCurrentFunction : @props.setCurrentFunction
             key : "invocation-" + invocation.id
           )
         )
     )
 
-
-    return R.div {className, onScroll: @onScroll},
+    R.div {className, onScroll: @onScroll},
       spacer.top
       elements
       spacer.bottom

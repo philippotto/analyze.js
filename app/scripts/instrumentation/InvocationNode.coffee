@@ -15,6 +15,12 @@ class InvocationNode
     @changedDOM = false
     @dirty = true
     @isRoot = false
+    @isCollapsed = false
+
+
+  toggleCollapsing : ->
+
+    @isCollapsed = !@isCollapsed
 
 
   addChild : (child) ->
