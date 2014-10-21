@@ -64,6 +64,22 @@ __Can I get notified about future releases of analyze.js?__
 Yes! Visit this [issue](https://github.com/philippotto/analyze.js/issues/3) and click on "subscribe".
 
 
+__How can I contribute to the project?__
+
+Just test it, star it on GitHub or open issues. You also can submit a Pull Request, but please open an issue before so we can discuss the idea and no work is done twice.
+
+
+
+## Screenshots
+
+__The main view:__
+
+![Main View](http://philippotto.github.io/analyze.js/screenshots/main.png)
+
+
+__WIP...__
+
+
 ## License
 
 MIT © Philipp Otto 2014
