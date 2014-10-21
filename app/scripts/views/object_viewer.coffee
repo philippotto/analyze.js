@@ -7,14 +7,6 @@ with_react : withReact
 
 ObjectViewer = React.createClass
 
-  getInitialState : ->
-
-    searchQuery : ""
-
-  handleSearch : (searchQuery) ->
-
-    @setState {searchQuery}
-
   getElementsForObject : (obj) ->
 
     eval(withReact.import)

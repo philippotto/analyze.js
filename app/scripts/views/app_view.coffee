@@ -15,42 +15,54 @@ AppView = React.createClass
 
   getInitialState : ->
 
-    searchQuery : ""
+    searchQuery : 'c(name, "") and c(path, "")'
+    searchFilter : -> true
     narrowCallHistory : false
     currentFunction : null
 
 
-  handleSearch : (searchQuery) ->
+  updateState : (query) ->
 
-    console.time("handleSearch")
-    @setState {searchQuery}
+    @setState(React.addons.update(@state, query))
+
+
+  setSearch : (searchQuery, searchFilter) ->
+
+    console.time("setSearchQuery")
+    @updateState(
+      searchQuery :
+        $set : searchQuery
+      searchFilter :
+        $set : searchFilter
+
+    )
 
 
   toggleNarrowCallHistory : ->
 
-    @setState(React.addons.update(@state,
+    @updateState(
       narrowCallHistory :
         $apply : (b) -> !b
-    ))
+    )
 
 
   componentDidUpdate : ->
 
-    console.timeEnd("handleSearch")
+    console.timeEnd("setSearchQuery")
 
 
   render : ->
 
     setCurrentFunction = (jsFunction) =>
 
-      @setState(React.addons.update(@state, {
+      @updateState(
         currentFunction :
           $set : jsFunction
-      }))
+      )
 
 
     callHistoryView = CallHistoryView {
-      searchQuery : @state.searchQuery
+      searchFilter : @state.searchFilter
       callGraph : @props.callGraph
       narrowCallHistory : @state.narrowCallHistory,
       setCurrentFunction
@@ -70,7 +82,7 @@ AppView = React.createClass
     R.div {className : "flexbox-parent"},
       NavigationView
         className : "flexbox-item header"
-        onSearch : @handleSearch
+        setSearch : @setSearch
         searchQuery : @state.searchQuery
       R.div {className : outerFlexClass},
         callHistoryView

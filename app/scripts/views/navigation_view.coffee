@@ -3,7 +3,7 @@ react : React
 react-bootstrap : ReactBootstrap
 with_react : withReact
 ./object_viewer : ObjectViewer
-
+filtrex : filtrex
 ###
 
 R = withReact.R
@@ -13,8 +13,16 @@ NavigationView = React.createClass
 
   handleSearch : ->
 
-    searchQuery = @refs.searchInput.getValue()
-    @props.onSearch(searchQuery)
+    searchExpression = @refs.searchInput.getValue()
+    contains = (a, b) -> a.indexOf(b) > -1
+
+    try
+      filter = filtrex(searchExpression, {c : contains})
+    catch e
+      filter = -> true
+
+    @props.setSearch(searchExpression, filter)
+
 
   render : ->
 
@@ -28,14 +36,10 @@ NavigationView = React.createClass
             R.Input {
               type: "text"
               className : "form-control"
+              style :
+                width : 300
               placeholder: "Search"
               onChange: @handleSearch
               value: @props.searchQuery
               ref: "searchInput"
             }
-        R.DropdownButton key:3, title:"Dropdown",
-          R.MenuItem key: "1",
-            "Action"
-          R.MenuItem divider : true
-          R.MenuItem key: "4",
-            "Separated link"

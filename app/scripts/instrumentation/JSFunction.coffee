@@ -13,8 +13,12 @@ class JSFunction
 
   getParameters : -> @params
 
-  matches : (query) ->
+  matches : (filter) ->
 
-    return _.any([@getName(), @getFileURL()], (property) ->
-      property.toLowerCase().indexOf(query.toLowerCase()) > -1
-    )
+    props =
+      name : @getName()
+      path : @getFileURL()
+      source : @getSourceString()
+      params : @getParameters()
+
+    return filter(props)

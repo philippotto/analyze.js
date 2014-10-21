@@ -75,7 +75,7 @@ CallHistoryView = React.createClass
     @collectedInvocations = callGraph.collectInvocations(
       root
       callGraph.getSize()
-      @props.searchQuery
+      @props.searchFilter
     )
 
     boundForceUpdateFn = @forceUpdate.bind(@)
@@ -86,7 +86,6 @@ CallHistoryView = React.createClass
         .map((invocation) =>
           InvocationView(
             invocation : invocation
-            searchQuery : @props.searchQuery
             forceUpdate : boundForceUpdateFn
             setCurrentFunction : @props.setCurrentFunction
             key : "invocation-" + invocation.id

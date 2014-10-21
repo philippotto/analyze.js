@@ -98,13 +98,13 @@ class InvocationNode
     @returnValue
 
 
-  matches : (query) ->
+  matches : (filter) ->
 
     if @isRoot
       # is it conceptionally sensible that the root is asked whether it matches?
       return true
 
-    return @jsFunction.matches(query)
+    return @jsFunction.matches(filter)
 
 
   hasChildren : ->

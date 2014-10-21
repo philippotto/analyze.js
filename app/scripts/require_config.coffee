@@ -13,6 +13,7 @@ require.config(
     react : "../bower_components/react/react-with-addons"
     "react-bootstrap" : "../bower_components/react-bootstrap/react-bootstrap"
     hljs : "../bower_components/highlightjs/highlight.pack"
+    filtrex : "../bower_components/filtrex/filtrex.min"
 
   map :
     backbone :
