@@ -89,6 +89,10 @@ describe("Instrumenter", ->
     function a() {};
     var b = function() {};
     var bb = function() {}.bind(this);
+
+    var fnVar;
+    fnVar = function() {};
+
     var obj = {
       c : function() {},
       d : function() { var d; }.bind(this)
@@ -100,6 +104,9 @@ describe("Instrumenter", ->
     var callAnonymous = function() {
       caller(function() {});
     };
+
+    var Class = function() {};
+    Class.prototype.method = function() {};
     """
 
     instrumentedCode = instrumenter.instrument(fnCode, "")
@@ -132,6 +139,12 @@ describe("Instrumenter", ->
 
     eval("callAnonymous()")
     expect(protocol.enter.props.name).toBe("anonymousFn")
+
+    eval("Class.prototype.method()")
+    expect(protocol.enter.props.name).toBe("method")
+
+    eval("fnVar()")
+    expect(protocol.enter.props.name).toBe("fnVar")
   )
 
   it("can get the original source of nested functions", ->

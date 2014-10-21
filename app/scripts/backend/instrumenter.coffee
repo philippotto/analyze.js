@@ -58,7 +58,12 @@ class Instrumenter
       ).toString()
 
     catch e
-      console.error("error at transforming", fileURL, "is it JavaScript? file will stay gracefully untouched.")
+      console.error(
+        "error at transforming"
+        fileURL
+        "is it JavaScript? file will stay gracefully untouched. Error"
+        e
+      )
       return codeString
 
 
@@ -70,10 +75,10 @@ class Instrumenter
 
       alternateName = switch father.type
         when "VariableDeclarator"
-          # var a = function() {}
+          # e.g.: var a = function() {}
           father.id.name
         when "Property"
-          # { a : function() {} }
+          # e.g.: { a : function() {} }
           father.key.name
         when "MemberExpression"
           grandpa = father.parent
@@ -81,11 +86,31 @@ class Instrumenter
 
           if grandpa.type == "CallExpression"
             if greatGrandpa.type == "VariableDeclarator"
-              # something like var a = function() {}.bind(this)
+              # e.g.: var a = function() {}.bind(this)
               greatGrandpa.id.name
             else if greatGrandpa.type == "Property"
-              # something like {a : function() {}.bind(this)}
+              # e.g.: {a : function() {}.bind(this)}
               greatGrandpa.key.name
+
+            # TODO: check for AssignmentExpression etc.
+            # find a better structure to keep it dry
+
+
+        when "AssignmentExpression"
+
+          if father.right.type == "FunctionExpression"
+            if father.left.type == "MemberExpression"
+              # e.g.: Class.prototype.method = function() {}
+
+              traversingNode = father.left
+              while traversingNode.property?
+                traversingNode = traversingNode.property
+
+              traversingNode.name
+
+            else if father.left.type == "Identifier"
+              # e.g.: variable = function() {}
+              father.left.name
 
       alternateName ||= "anonymousFn"
 
