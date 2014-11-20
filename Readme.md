@@ -14,7 +14,7 @@ __analyze.js is currently work in progress.__
 
 The main goal of analyze.js is to simplify understanding of code (especially in large code bases).
 Common use cases are  familiarizing with a project as well as refactoring, debugging and reverse engineering.
-Optimizing performance is also a possible use case, but it is not a central goal since there are already other very good tools faciliting this (especially the Chrome Dev Tools).
+Optimizing performance is also a possible use case, but it is not a central goal since there are already other very good tools facilitating this (especially the Chrome Dev Tools).
 
 
 ## How to use
